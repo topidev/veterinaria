@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import { Inter } from 'next/font/google';
-import { ChakraProvider } from "@chakra-ui/react";
-import darkTheme from "@/styles/themes";
-import { Provider } from "@chakra-ui/react/provider";
-import { ThemeToggleButton } from "@/components/ui/ToggleTheme";
 import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -20,8 +16,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const inter = Inter({subsets: ['latin']})
-
 export const metadata: Metadata = {
   title: 'Veterinaria',
   description: 'Sistema de gestión para veterinaria',
@@ -33,11 +27,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", inter.variable)}>
+    <html lang="en" className={cn("font-sans", inter.variable)} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+      <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
          {children}
+        </ThemeProvider>
           
       </body>
     </html>

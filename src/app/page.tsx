@@ -1,18 +1,17 @@
 // src/app/page.tsx
 'use client'
-import { ThemeToggleButton } from '@/components/ui/ToggleTheme';
-import { Button, Heading } from '@chakra-ui/react';
+
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
     <main className='flex flex-col gap-4'>
-      <Heading as="h1" size="xl" mb={4}>
+      <h1>
         ¡Bienvenido a la Veterinaria!
-      </Heading>
-      <Button colorScheme="teal" size="md">
+      </h1>
+      <Button variant='link'>
         Haz clic aquí
       </Button>
-      <ThemeToggleButton />
     </main>
   );
 }
