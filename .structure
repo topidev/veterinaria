@@ -1,0 +1,50 @@
+vetPoint/
+├── public/                  # Archivos estáticos (imágenes, fuentes, etc.)
+├── src/
+│   ├── app/                 # Next.js App Router
+│   │   ├── (auth)/          # Rutas relacionadas con autenticación
+│   │   │   ├── login/
+│   │   │   ├── register/
+│   │   │   └── ...
+│   │   ├── (dashboard)/      # Rutas protegidas (ej: panel de admin, veterinarios, clientes)
+│   │   │   ├── admin/
+│   │   │   ├── veterinarios/
+│   │   │   ├── clientes/
+│   │   │   └── ...
+│   │   ├── reservaciones/   # Módulo de reservaciones
+│   │   ├── mensajeria/      # Módulo de mensajería en tiempo real
+│   │   ├── pagos/           # Módulo de pagos
+│   │   ├── layout.tsx       # Layout principal
+│   │   └── page.tsx         # Página principal
+│   │
+│   ├── components/          # Componentes reutilizables
+│   │   ├── ui/              # Componentes de UI (botones, tarjetas, etc.)
+│   │   ├── auth/            # Componentes de autenticación
+│   │   ├── dashboard/       # Componentes del dashboard
+│   │   ├── reservaciones/   # Componentes de reservaciones
+│   │   ├── mensajeria/      # Componentes de mensajería
+│   │   └── pagos/           # Componentes de pagos
+│   │
+│   ├── lib/                 # Funciones y utilidades
+│   │   ├── supabase/        # Configuración de Supabase
+│   │   ├── stripe/          # Configuración de Stripe
+│   │   ├── auth/            # Funciones de autenticación
+│   │   └── utils/           # Funciones utilitarias
+│   │
+│   ├── styles/              # Estilos globales y temas
+│   │   ├── globals.css      # Estilos globales
+│   │   └── theme/           # Configuración de temas (si usas Chakra UI o Tailwind)
+│   │
+│   ├── types/               # Tipos de TypeScript
+│   │   ├── index.ts         # Tipos globales
+│   │   ├── supabase.ts      # Tipos de Supabase
+│   │   └── stripe.ts        # Tipos de Stripe
+│   │
+│   └── middleware.ts        # Middleware para protección de rutas
+│
+├── next.config.js           # Configuración de Next.js
+├── package.json
+└── README.md
+
+VetPoint
+Mr.Dogtor122

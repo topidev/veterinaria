@@ -13,6 +13,9 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    "extends": ["next", "next/core-web-vitals", "plugin:prettier/recommended"]
+  }
 ]);
 
 export default eslintConfig;
