@@ -68,6 +68,7 @@ export async function register(data: RegisterFormData): Promise<ActionResult> {
       // Estos datos llegan al trigger handle_new_user() que creamos en Sprint 0.
       // El trigger los lee con: NEW.raw_user_meta_data ->> 'full_name'
       // y los inserta en la tabla profiles automáticamente.
+      // emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/callback`,
       data: {
         full_name: parsed.data.full_name,
         role: 'cliente',
@@ -86,7 +87,7 @@ export async function register(data: RegisterFormData): Promise<ActionResult> {
   // Supabase envía un correo de confirmación por defecto.
   // En lugar de redirigir al dashboard (sesión no activa aún),
   // redirigimos a una página que le dice al usuario que revise su correo.
-  redirect('/login?message=check_email')
+  redirect(`/login?message=check_email&email=${encodeURIComponent(parsed.data.email)}`)
 }
 
 // ─── Logout ────────────────────────────────────────────────────────────────────
@@ -152,4 +153,27 @@ export async function forgotPassword(data: ForgotPasswordFormData): Promise<Acti
   // Siempre redirigimos con el mismo mensaje aunque el email no exista.
   // Confirmar si un email existe o no es un riesgo de seguridad (user enumeration).
   redirect('/forgot-password?message=email_sent')
+}
+
+// ─── Reenviar email de confirmación ────────────────────────────────────────────
+
+export async function resendConfirmation(email: string): Promise<ActionResult> {
+  if (!email || !email.includes('@')) {
+    return { error: 'Email inválido.' }
+  }
+
+  const supabase = await createClient()
+
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email,
+    options: {
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/callback`,
+    },
+  })
+
+  if (error) {
+    // Rate limit de Supabase — no exponemos el mensaje exacto
+    return { error: 'Espera un momento antes de volver a intentarlo.' }
+  }
 }

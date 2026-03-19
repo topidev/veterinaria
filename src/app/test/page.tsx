@@ -1,4 +1,4 @@
-import { ThemeToggle } from '@/components/ui/themeToggle';
+import { ThemeToggle } from '@/components/shared/themeToggle';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function TestPage() {

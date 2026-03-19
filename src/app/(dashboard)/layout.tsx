@@ -6,6 +6,9 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { AppSidebar } from '@/components/dashboard/AppSidebar'
+import { Separator } from '@/components/ui/separator'
 import type { UserRole } from '@/types/supabase'
 
 // Mapa de rol → ruta de su dashboard.
@@ -52,33 +55,24 @@ export default async function DashboardLayout({
   }
 
   return (
-    // Estructura base del dashboard: sidebar + contenido principal.
-    // El sidebar se construye en Sprint 2 — por ahora solo el shell.
-    <div className="min-h-screen flex">
-
-      {/* Sidebar placeholder — Sprint 2 lo convierte en componente real */}
-      <aside className="w-64 border-r bg-background hidden md:flex flex-col">
-        <div className="p-4 border-b">
-          <span className="font-semibold text-sm">VetPoint</span>
-        </div>
-        <nav className="flex-1 p-4">
-          {/* NavLinks van aquí en Sprint 2 */}
-        </nav>
-        <div className="p-4 border-t">
-          <p className="text-xs text-muted-foreground truncate">
-            {profile.full_name ?? user.email}
-          </p>
-          <p className="text-xs text-muted-foreground capitalize">
-            {profile.role}
-          </p>
-        </div>
-      </aside>
-
-      {/* Contenido principal */}
-      <main className="flex-1 overflow-auto">
-        {children}
-      </main>
-
-    </div>
+    // SidebarProvider controla el estado open/closed.
+    // Va aqui y no en el root layout porque solo el dashboard lo necesita.
+    <SidebarProvider>
+      <AppSidebar
+        role={profile.role as UserRole}
+        fullName={profile.full_name}
+        email={user.email ?? ''}
+        avatarUrl={profile.avatar_url}
+      />
+      <SidebarInset>
+        <header className="flex h-14 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="h-4" />
+        </header>
+        <main className="flex-1 p-6">
+          {children}
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
