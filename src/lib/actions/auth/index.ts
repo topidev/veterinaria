@@ -52,8 +52,8 @@ export async function login(data: LoginFormData): Promise<ActionResult> {
 
 // ─── Registro ──────────────────────────────────────────────────────────────────
 
-export async function register(data: RegisterFormData): Promise<ActionResult> {
-  const parsed = registerSchema.safeParse(data)
+export async function register(dato: RegisterFormData): Promise<ActionResult> {
+  const parsed = registerSchema.safeParse(dato)
 
   if (!parsed.success) {
     return { error: 'Datos inválidos. Verifica el formulario.' }
@@ -61,17 +61,14 @@ export async function register(data: RegisterFormData): Promise<ActionResult> {
 
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      // Estos datos llegan al trigger handle_new_user() que creamos en Sprint 0.
-      // El trigger los lee con: NEW.raw_user_meta_data ->> 'full_name'
-      // y los inserta en la tabla profiles automáticamente.
-      // emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/callback`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/callback`,
       data: {
         full_name: parsed.data.full_name,
-        role: 'cliente',
+        role: 'cliente', // siempre cliente — los vets entran por invitación del admin
         phone: parsed.data.phone ?? null,
       },
     },
@@ -84,10 +81,13 @@ export async function register(data: RegisterFormData): Promise<ActionResult> {
     return { error: 'Error al crear la cuenta. Intenta de nuevo.' }
   }
 
-  // Supabase envía un correo de confirmación por defecto.
-  // En lugar de redirigir al dashboard (sesión no activa aún),
-  // redirigimos a una página que le dice al usuario que revise su correo.
-  redirect(`/login?message=check_email&email=${encodeURIComponent(parsed.data.email)}`)
+  // data.session existe → confirmación desactivada, usuario ya autenticado
+  // data.session es null → esperando confirmación por email
+  if (data.session) {
+    redirect('/dashboard')
+  } else {
+    redirect(`/login?message=check_email&email=${encodeURIComponent(parsed.data.email)}`)
+  }
 }
 
 // ─── Logout ────────────────────────────────────────────────────────────────────

@@ -26,9 +26,9 @@ const PROTECTED_ROUTES = ['/dashboard']
 
 // Rutas exclusivas por rol
 const ROLE_ROUTES: Record<string, string> = {
-  '/dashboard/admin':       'admin',
+  '/dashboard/admin': 'admin',
   '/dashboard/veterinario': 'veterinario',
-  '/dashboard/cliente':     'cliente',
+  '/dashboard/cliente': 'cliente',
 }
 
 export async function middleware(request: NextRequest) {
@@ -39,6 +39,7 @@ export async function middleware(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request)
 
   // ─── Paso 2: Si el usuario NO está autenticado ─────────────────────────────
+
 
   if (!user) {
     // Si intenta acceder a una ruta protegida → redirige al login
@@ -57,26 +58,45 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  // ─── Paso 3: Si el usuario SÍ está autenticado ────────────────────────────
-
-  // Si intenta ir al login/register siendo ya autenticado → redirige al dashboard
-  const isAuthRoute = AUTH_ROUTES.some(route => pathname.startsWith(route))
-  if (isAuthRoute) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+  if (user) {
+    console.log('🔵 user.user_metadata:', user.user_metadata)
+    console.log('🔵 userRole:', user.user_metadata?.role)
   }
 
-  // Paso 4: Verificar rol para rutas exclusivas
+
+  // ─── Paso 3: Si el usuario SÍ está autenticado ────────────────────────────
+
   // El rol viene del JWT de Supabase — no hacemos query a DB aquí
   // (las queries a DB son lentas; el middleware debe ser ultrarrápido)
   const userRole = user.user_metadata?.role as string | undefined
 
-  for (const [routePrefix, requiredRole] of Object.entries(ROLE_ROUTES)) {
-    if (pathname.startsWith(routePrefix) && userRole !== requiredRole) {
-      // Tiene sesión pero el rol no coincide → redirige a SU dashboard
-      const userDashboard = userRole
-        ? `/dashboard/${userRole}`
-        : '/dashboard'
-      return NextResponse.redirect(new URL(userDashboard, request.url))
+  // Si intenta ir al login/register siendo ya autenticado → redirige al dashboard
+  // ─── Con sesión: bloquear rutas de auth ────────────────────────────────────
+  const isAuthRoute = AUTH_ROUTES.some(route => pathname.startsWith(route))
+  if (isAuthRoute) {
+    const destination = userRole ? `/dashboard/${userRole}` : '/dashboard'
+    return NextResponse.redirect(new URL(destination, request.url))
+  }
+
+
+  // ─── Con sesión: /dashboard genérico → sub-dashboard del rol ──────────────
+  // Sin esto el usuario se queda en /dashboard sin llegar a su página real.
+  if (pathname === '/dashboard') {
+    const destination = userRole ? `/dashboard/${userRole}` : '/login'
+    return NextResponse.redirect(new URL(destination, request.url))
+  }
+
+  // ─── Con sesión: verificar que el rol coincide con la ruta ─────────────────
+  // Solo verificar rol si userRole existe
+  if (userRole) {
+    for (const [routePrefix, requiredRole] of Object.entries(ROLE_ROUTES)) {
+      if (pathname.startsWith(routePrefix) && userRole !== requiredRole) {
+        // Tiene sesión pero el rol no coincide → redirige a SU dashboard
+        const userDashboard = userRole
+          ? `/dashboard/${userRole}`
+          : '/dashboard'
+        return NextResponse.redirect(new URL(userDashboard, request.url))
+      }
     }
   }
 
