@@ -60,10 +60,6 @@ export const registerSchema = z
       .optional()
       .or(z.literal('')),
 
-    role: z.enum(['veterinario', 'cliente'], {
-      error: 'Selecciona un tipo de cuenta',
-    }),
-
     password: z
       .string()
       .min(8, 'La contraseña debe tener al menos 8 caracteres')
