@@ -92,7 +92,7 @@ export function AppSidebar({ role, fullName, email, avatarUrl }: AppSidebarProps
             <PawPrint className="h-4 w-4 text-primary-foreground" />
           </div>
           <div>
-            <p className="text-sm font-semibold leading-none">VetPoint</p>
+            <p className="text-sm font-semibold leading-none">PetCare</p>
             <p className="text-xs text-muted-foreground mt-0.5">{roleLabel[role]}</p>
           </div>
         </div>
@@ -111,7 +111,10 @@ export function AppSidebar({ role, fullName, email, avatarUrl }: AppSidebarProps
               return (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
-                    <Link href={item.href}>
+                    <Link href={item.href} className={`
+                      ${isActive ? 'bg-accent text-primary-foreground' : ''}
+                      transition-colors duration-350 cursor-pointer hover:bg-primary hover:text-primary-foreground`}
+                    >
                       <item.icon className="h-4 w-4" />
                       <span>{item.label}</span>
                     </Link>
@@ -128,7 +131,7 @@ export function AppSidebar({ role, fullName, email, avatarUrl }: AppSidebarProps
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent">
+                <SidebarMenuButton size="lg" className="transition-colors duration-350 data-[state=open]:bg-sidebar-accent cursor-pointer hover:bg-primary hover:text-primary-foreground">
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage src={avatarUrl ?? undefined} alt={fullName ?? 'Usuario'} />
                     <AvatarFallback className="rounded-lg text-xs">
@@ -143,11 +146,11 @@ export function AppSidebar({ role, fullName, email, avatarUrl }: AppSidebarProps
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-56">
                 <DropdownMenuItem asChild>
-                  <Link href={`/dashboard/${role}/perfil`}>Mi perfil</Link>
+                  <Link className='transition-colors duration-350 cursor-pointer hover:bg-primary! hover:text-primary-foreground!' href={`/dashboard/${role}/perfil`}>Mi perfil</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="text-destructive focus:text-destructive"
+                  className="transition-colors duration-350 cursor-pointer text-destructive focus:text-destructive hover:bg-primary! hover:text-primary-foreground!"
                   onSelect={() => logout()}
                 >
                   Cerrar sesión

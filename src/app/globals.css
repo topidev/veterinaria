@@ -8,67 +8,180 @@
    (reemplazan tailwindcss-animate que es v3)
 ───────────────────────────────────────── */
 @keyframes accordion-down {
-  from { height: 0; opacity: 0; }
-  to   { height: var(--radix-accordion-content-height); opacity: 1; }
+  from {
+    height: 0;
+    opacity: 0;
+  }
+
+  to {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
 }
+
 @keyframes accordion-up {
-  from { height: var(--radix-accordion-content-height); opacity: 1; }
-  to   { height: 0; opacity: 0; }
+  from {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+
+  to {
+    height: 0;
+    opacity: 0;
+  }
 }
+
 @keyframes collapsible-down {
-  from { height: 0; opacity: 0; }
-  to   { height: var(--radix-collapsible-content-height); opacity: 1; }
+  from {
+    height: 0;
+    opacity: 0;
+  }
+
+  to {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
 }
+
 @keyframes collapsible-up {
-  from { height: var(--radix-collapsible-content-height); opacity: 1; }
-  to   { height: 0; opacity: 0; }
+  from {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+
+  to {
+    height: 0;
+    opacity: 0;
+  }
 }
+
 @keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
+
 @keyframes fade-out {
-  from { opacity: 1; }
-  to   { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
 }
+
 @keyframes zoom-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
+
 @keyframes zoom-out {
-  from { opacity: 1; transform: scale(1); }
-  to   { opacity: 0; transform: scale(0.95); }
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 }
+
 @keyframes slide-in-from-top {
-  from { transform: translateY(-100%); }
-  to   { transform: translateY(0); }
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
+
 @keyframes slide-in-from-bottom {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
+
 @keyframes slide-in-from-left {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(0); }
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
+
 @keyframes slide-in-from-right {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
+
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
+
 @keyframes ping {
-  75%, 100% { transform: scale(2); opacity: 0; }
+
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
 }
+
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
+
 @keyframes bounce {
-  0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
-  50%       { transform: translateY(0);    animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+
+  0%,
+  100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
 }
 
 /* ─────────────────────────────────────────
@@ -76,18 +189,18 @@
 ───────────────────────────────────────── */
 @theme {
   /* Colores semánticos */
-  --color-background:           var(--background);
-  --color-foreground:           var(--foreground);
-  --color-primary:              var(--primary);
-  --color-primary-foreground:   var(--primary-foreground);
-  --color-secondary:            var(--secondary);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-accent:               var(--accent);
-  --color-accent-foreground:    var(--accent-foreground);
-  --color-destructive:          var(--destructive);
-  --color-border:               var(--border);
-  --color-input:                var(--input);
-  --color-ring:                 var(--ring);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
   /* Radios */
   --radius-lg: var(--radius);
@@ -95,22 +208,22 @@
   --radius-sm: calc(var(--radius) - 4px);
 
   /* Animaciones registradas como utilities de Tailwind v4 */
-  --animate-accordion-down:     accordion-down 0.2s ease-out;
-  --animate-accordion-up:       accordion-up 0.2s ease-out;
-  --animate-collapsible-down:   collapsible-down 0.2s ease-out;
-  --animate-collapsible-up:     collapsible-up 0.2s ease-out;
-  --animate-fade-in:            fade-in 0.2s ease-out;
-  --animate-fade-out:           fade-out 0.2s ease-out;
-  --animate-zoom-in:            zoom-in 0.2s ease-out;
-  --animate-zoom-out:           zoom-out 0.2s ease-out;
-  --animate-spin:               spin 1s linear infinite;
-  --animate-ping:               ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-  --animate-pulse:              pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  --animate-bounce:             bounce 1s infinite;
-  --animate-slide-in-from-top:    slide-in-from-top 0.3s ease-out;
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-collapsible-down: collapsible-down 0.2s ease-out;
+  --animate-collapsible-up: collapsible-up 0.2s ease-out;
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-fade-out: fade-out 0.2s ease-out;
+  --animate-zoom-in: zoom-in 0.2s ease-out;
+  --animate-zoom-out: zoom-out 0.2s ease-out;
+  --animate-spin: spin 1s linear infinite;
+  --animate-ping: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+  --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-bounce: bounce 1s infinite;
+  --animate-slide-in-from-top: slide-in-from-top 0.3s ease-out;
   --animate-slide-in-from-bottom: slide-in-from-bottom 0.3s ease-out;
-  --animate-slide-in-from-left:   slide-in-from-left 0.3s ease-out;
-  --animate-slide-in-from-right:  slide-in-from-right 0.3s ease-out;
+  --animate-slide-in-from-left: slide-in-from-left 0.3s ease-out;
+  --animate-slide-in-from-right: slide-in-from-right 0.3s ease-out;
 }
 
 /* ─────────────────────────────────────────
@@ -134,13 +247,15 @@
   }
 
   .dark {
-    --background: oklch(0.145 0 0);
+    --background: oklch(0.1733 0.0125 237.64);
     --foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
+    /* --primary: oklch(0.922 0 0); */
+    --primary: oklch(0.7204 0.1317 178.85);
     --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
+    --secondary: oklch(0.8569 0.0141 247.99);
     --secondary-foreground: oklch(0.985 0 0);
-    --accent: oklch(0.269 0 0);
+    --accent: oklch(0.7511 0.1485 36.34);
+    /* --accent: oklch(0.269 0 0); */
     --accent-foreground: oklch(0.985 0 0);
     --destructive: oklch(0.704 0.191 22.216);
     --border: oklch(1 0 0 / 10%);

@@ -24,6 +24,8 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password']
 // Rutas que requieren autenticación (cualquier rol)
 const PROTECTED_ROUTES = ['/dashboard']
 
+const PUBLIC_ROUTES = ['/callback']
+
 // Rutas exclusivas por rol
 const ROLE_ROUTES: Record<string, string> = {
   '/dashboard/admin': 'admin',
@@ -34,12 +36,18 @@ const ROLE_ROUTES: Record<string, string> = {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  if (PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
+    return NextResponse.next()
+  }
+
   // Paso 1: Refrescar sesión y obtener usuario
   // updateSession también retorna el user para no hacer dos llamadas a Supabase
   const { supabaseResponse, user } = await updateSession(request)
 
   // ─── Paso 2: Si el usuario NO está autenticado ─────────────────────────────
 
+  console.log('🔵 middleware pathname:', pathname)
+  console.log('🔵 middleware user:', user?.id ?? 'sin usuario')
 
   if (!user) {
     // Si intenta acceder a una ruta protegida → redirige al login
@@ -58,17 +66,13 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  if (user) {
-    console.log('🔵 user.user_metadata:', user.user_metadata)
-    console.log('🔵 userRole:', user.user_metadata?.role)
-  }
-
 
   // ─── Paso 3: Si el usuario SÍ está autenticado ────────────────────────────
 
   // El rol viene del JWT de Supabase — no hacemos query a DB aquí
   // (las queries a DB son lentas; el middleware debe ser ultrarrápido)
   const userRole = user.user_metadata?.role as string | undefined
+  console.log('🔵 middleware userRole:', userRole)
 
   // Si intenta ir al login/register siendo ya autenticado → redirige al dashboard
   // ─── Con sesión: bloquear rutas de auth ────────────────────────────────────
@@ -82,8 +86,12 @@ export async function middleware(request: NextRequest) {
   // ─── Con sesión: /dashboard genérico → sub-dashboard del rol ──────────────
   // Sin esto el usuario se queda en /dashboard sin llegar a su página real.
   if (pathname === '/dashboard') {
-    const destination = userRole ? `/dashboard/${userRole}` : '/login'
-    return NextResponse.redirect(new URL(destination, request.url))
+    if (userRole) {
+      return NextResponse.redirect(new URL(`/dashboard/${userRole}`, request.url))
+    }
+    // Sin rol en JWT → dejar pasar al dashboard layout
+    // El layout lee el rol directo de la DB y redirige correctamente
+    return supabaseResponse
   }
 
   // ─── Con sesión: verificar que el rol coincide con la ruta ─────────────────
