@@ -36,6 +36,7 @@ export function LoginForm() {
   }
 
   const handleGoogleLogin = () => {
+    console.log("Iniciando con google...")
     startTransition(async () => {
       const result = await loginWithGoogle()
       if (result?.error) setServerError(result.error)

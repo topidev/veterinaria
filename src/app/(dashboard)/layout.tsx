@@ -47,6 +47,15 @@ export default async function DashboardLayout({
     redirect('/login?error=account_inactive')
   }
 
+  if (profile.role !== user.user_metadata?.role) {
+    const supabase = await createClient()
+    console.log("[Dasboard/Layout] --- Revisando el role del usuario...", profile.role)
+    await supabase.auth.updateUser({
+      data: { role: profile.role }
+    })
+    redirect(`/dashboard/${profile.role}`)
+  }
+
 
   return (
     // SidebarProvider controla el estado open/closed.
