@@ -231,18 +231,25 @@
 ───────────────────────────────────────── */
 @layer base {
   :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
+    --background: oklch(0.985 0.005 240); ;
+    /* --background: oklch(1 0 0); */
+    --foreground: oklch(0.22 0.02 240);
+    /* --foreground: oklch(0.145 0 0); */
+    --primary: oklch(0.55 0.13 178.85);
+    /* --primary: oklch(0.205 0 0); */
     --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    /* --primary-foreground: oklch(0.985 0 0); */
+    --secondary: oklch(0.92 0.02 247.99);
+    /* --secondary: oklch(0.97 0 0); */
+    --secondary-foreground: oklch(0.22 0.02 240);
+    /* --secondary-foreground: oklch(0.205 0 0); */
+    --accent: oklch(0.65 0.15 36.34);
+    /* --accent: oklch(0.97 0 0); */
+    --accent-foreground: oklch(0.22 0.02 240);
+    --destructive: oklch(0.58 0.19 22.216);
+    --border: oklch(0.22 0.02 240 / 10%);
+    --input: oklch(0.22 0.02 240 / 12%);
+    --ring: oklch(0.55 0.13 178.85);
     --radius: 0.625rem;
   }
 
@@ -252,7 +259,7 @@
     /* --primary: oklch(0.922 0 0); */
     --primary: oklch(0.7204 0.1317 178.85);
     --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.8569 0.0141 247.99);
+    --secondary: oklch(56.15% 0.056 178.30);
     --secondary-foreground: oklch(0.985 0 0);
     --accent: oklch(0.7511 0.1485 36.34);
     /* --accent: oklch(0.269 0 0); */

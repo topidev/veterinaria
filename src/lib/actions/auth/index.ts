@@ -5,9 +5,11 @@ import { createClient } from '@/lib/supabase/server'
 import {
   loginSchema,
   registerSchema,
+  resetPasswordSchema,
   forgotPasswordSchema,
   type LoginFormData,
   type RegisterFormData,
+  type ResetPasswordFormData,
   type ForgotPasswordFormData,
 } from '@/lib/validations/auth'
 
@@ -176,4 +178,38 @@ export async function resendConfirmation(email: string): Promise<ActionResult> {
     // Rate limit de Supabase — no exponemos el mensaje exacto
     return { error: 'Espera un momento antes de volver a intentarlo.' }
   }
+}
+
+// ─── Setear nueva contraseña (invite + recovery) ───────────────────────────────
+ 
+export async function setNewPassword(data: ResetPasswordFormData): Promise<ActionResult> {
+  const parsed = resetPasswordSchema.safeParse(data)
+ 
+  if (!parsed.success) {
+    return { error: 'Datos inválidos.' }
+  }
+ 
+  const supabase = await createClient()
+ 
+  // Verificar que hay sesión activa — el link del email ya la creó
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Sesión expirada. Solicita un nuevo link.' }
+ 
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  })
+ 
+  if (error) {
+    return { error: 'Error al guardar la contraseña. Intenta de nuevo.' }
+  }
+ 
+  // Leer el rol para redirigir al dashboard correcto
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+ 
+  const role = profile?.role ?? 'cliente'
+  redirect(`/dashboard/${role}`)
 }

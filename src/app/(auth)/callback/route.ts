@@ -5,6 +5,7 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/dashboard'
+  const type = searchParams.get("type") // invite, recovery o null
 
   console.log('🔵 Callback ejecutándose, code:', code ? 'existe' : 'NO existe')
   console.log('🔵 origin:', origin)
@@ -33,6 +34,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(
       `${origin}/login?error=auth_callback_failed`
     )
+  }
+
+  // Si es invitación → mandar a crear contraseña
+  if (type === 'invite' || type === 'recovery') {
+    return NextResponse.redirect(`${origin}/set-password?type=${type}`)
   }
 
   // Con OAuth (Google), user_metadata no tiene 'role'.

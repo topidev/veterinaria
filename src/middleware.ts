@@ -24,7 +24,7 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password']
 // Rutas que requieren autenticación (cualquier rol)
 const PROTECTED_ROUTES = ['/dashboard']
 
-const PUBLIC_ROUTES = ['/callback']
+const PUBLIC_ROUTES = ['/callback', '/set-password']
 
 // Rutas exclusivas por rol
 const ROLE_ROUTES: Record<string, string> = {
@@ -87,12 +87,8 @@ export async function middleware(request: NextRequest) {
   // ─── Con sesión: /dashboard genérico → sub-dashboard del rol ──────────────
   // Sin esto el usuario se queda en /dashboard sin llegar a su página real.
   if (pathname === '/dashboard') {
-    if (userRole) {
-      return NextResponse.redirect(new URL(`/dashboard/${userRole}`, request.url))
-    }
-    // Sin rol en JWT → dejar pasar al dashboard layout
-    // El layout lee el rol directo de la DB y redirige correctamente
-    return supabaseResponse
+    const destination = userRole ? `/dashboard/${userRole}` : '/login'
+    return NextResponse.redirect(new URL(destination, request.url))
   }
 
   // ─── Con sesión: verificar que el rol coincide con la ruta ─────────────────
