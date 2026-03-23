@@ -41,7 +41,7 @@ export async function login(data: LoginFormData): Promise<ActionResult> {
     // No exponemos el mensaje original por seguridad (no queremos decir
     // "el email no existe" vs "la contraseña es incorrecta" — eso es info
     // que un atacante puede usar para enumerar usuarios válidos).
-    if (error.message === 'Email not confirmed') {
+    if (error.message === 'Email not confirmed' || error.code === 'email_not_confirmed') {
       return { error: 'Confirma tu correo antes de iniciar sesión.' }
     }
     return { error: 'Correo o contraseña incorrectos.' }
@@ -77,7 +77,7 @@ export async function register(dato: RegisterFormData): Promise<ActionResult> {
   })
 
   if (error) {
-    if (error.message.includes('already registered')) {
+    if (error.message.includes('already registered') || error.code === 'user_already_exists') {
       return { error: 'Ya existe una cuenta con este correo.' }
     }
     return { error: 'Error al crear la cuenta. Intenta de nuevo.' }
@@ -186,12 +186,11 @@ export async function setNewPassword(data: ResetPasswordFormData): Promise<Actio
   const parsed = resetPasswordSchema.safeParse(data)
  
   if (!parsed.success) {
-    return { error: 'Datos inválidos.' }
+    return { error: 'Datos inválidos. Verifica el formulario.' }
   }
  
   const supabase = await createClient()
  
-  // Verificar que hay sesión activa — el link del email ya la creó
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Sesión expirada. Solicita un nuevo link.' }
  
@@ -200,10 +199,14 @@ export async function setNewPassword(data: ResetPasswordFormData): Promise<Actio
   })
  
   if (error) {
+    // Supabase lanza este error cuando la nueva contraseña
+    // es igual a la anterior
+    if (error.code === 'same_password') {
+      return { error: 'La nueva contraseña debe ser diferente a la anterior.' }
+    }
     return { error: 'Error al guardar la contraseña. Intenta de nuevo.' }
   }
  
-  // Leer el rol para redirigir al dashboard correcto
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')

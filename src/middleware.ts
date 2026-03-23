@@ -24,7 +24,7 @@ const AUTH_ROUTES = ['/login', '/register', '/forgot-password']
 // Rutas que requieren autenticación (cualquier rol)
 const PROTECTED_ROUTES = ['/dashboard']
 
-const PUBLIC_ROUTES = ['/callback', '/set-password']
+const PUBLIC_ROUTES = ['/callback', '/set-password', '/reset-password']
 
 // Rutas exclusivas por rol
 const ROLE_ROUTES: Record<string, string> = {

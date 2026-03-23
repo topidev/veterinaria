@@ -1,7 +1,7 @@
 // src/components/auth/SetPasswordForm.tsx
 'use client'
 
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -21,6 +21,7 @@ interface SetPasswordFormProps {
 
 export function SetPasswordForm({ title, description }: SetPasswordFormProps) {
   const [isPending, startTransition] = useTransition()
+  const [serverError, setServerError] = useState<string | null>(null)
 
   const {
     register,
@@ -32,10 +33,14 @@ export function SetPasswordForm({ title, description }: SetPasswordFormProps) {
   })
 
   const onSubmit = (data: ResetPasswordFormData) => {
+    setServerError(null)
     startTransition(async () => {
-      await setNewPassword(data)
-      // setNewPassword hace redirect() si tiene éxito
-      // si falla lanza error que Next.js maneja
+      const result = await setNewPassword(data)
+      // Si hay error del servidor lo mostramos
+      // Si tiene éxito, setNewPassword hace redirect() y nunca llega aquí
+      if (result?.error) {
+        setServerError(result.error)
+      }
     })
   }
 
@@ -48,6 +53,12 @@ export function SetPasswordForm({ title, description }: SetPasswordFormProps) {
 
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
+          {serverError && (
+            <Alert variant="destructive">
+              <AlertDescription>{serverError}</AlertDescription>
+            </Alert>
+          )}
 
           <div className="space-y-1.5">
             <Label htmlFor="password">Contraseña</Label>
@@ -74,6 +85,7 @@ export function SetPasswordForm({ title, description }: SetPasswordFormProps) {
               disabled={isPending}
               {...register('confirm_password')}
             />
+            {/* Este error viene del .refine() del schema — contraseñas no coinciden */}
             {errors.confirm_password && (
               <p className="text-xs text-destructive">{errors.confirm_password.message}</p>
             )}
