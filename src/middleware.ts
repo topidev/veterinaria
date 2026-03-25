@@ -47,8 +47,8 @@ export async function middleware(request: NextRequest) {
 
   // ─── Paso 2: Si el usuario NO está autenticado ─────────────────────────────
 
-  console.log('🔵 middleware pathname:', pathname)
-  console.log('🔵 middleware user:', user?.id ?? 'sin usuario')
+  console.log('🔵 [1] middleware pathname:', pathname)
+  console.log('🔵 [2] middleware user:', user?.id ?? 'sin usuario')
 
   if (!user) {
     // Si intenta acceder a una ruta protegida → redirige al login
@@ -73,7 +73,7 @@ export async function middleware(request: NextRequest) {
   // El rol viene del JWT de Supabase — no hacemos query a DB aquí
   // (las queries a DB son lentas; el middleware debe ser ultrarrápido)
   const userRole = user.user_metadata?.role as string | undefined
-  console.log('🔵 middleware userRole:', userRole)
+  console.log('🔵 [3] middleware userRole:', userRole)
 
   // Si intenta ir al login/register siendo ya autenticado → redirige al dashboard
   // ─── Con sesión: bloquear rutas de auth ────────────────────────────────────
@@ -116,7 +116,7 @@ export const config = {
      * - _next/static  → archivos estáticos de Next.js (JS, CSS bundles)
      * - _next/image   → optimización de imágenes de Next.js
      * - favicon.ico   → ícono del browser
-     * - archivos con extensión (imágenes, fuentes, etc.)
+     * - archivos con exsztensión (imágenes, fuentes, etc.)
      *
      * Nota para Junior: sin este matcher, el middleware correría incluso
      * para descargar un .png — innecesario y más lento.

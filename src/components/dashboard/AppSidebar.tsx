@@ -9,6 +9,7 @@ import {
   MessageSquare,
   PawPrint,
   Users,
+  User,
   Settings,
   CreditCard,
   Stethoscope,
@@ -55,6 +56,7 @@ const NAV_ITEMS: Record<UserRole, { label: string; href: string; icon: React.Ele
   ],
   cliente: [
     { label: 'Dashboard', href: '/dashboard/cliente', icon: LayoutDashboard },
+    { label: 'Mi perfil', href: '/dashboard/cliente/perfil', icon: User },
     { label: 'Mis mascotas', href: '/dashboard/cliente/mascotas', icon: PawPrint },
     { label: 'Reservaciones', href: '/reservaciones', icon: CalendarDays },
     { label: 'Mensajes', href: '/mensajeria', icon: MessageSquare },
