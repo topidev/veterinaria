@@ -37,7 +37,7 @@ export default async function ClienteDashboardPage() {
   const petList = pets ?? []
 
   return (
-    <div className="space-y-6 w-full m-auto max-w-[1500px]">
+    <div className="space-y-6 w-full m-auto max-w-375">
 
       {/* Header */}
       <div className="flex items-center justify-between gap-2 flex-col md:flex-row">
