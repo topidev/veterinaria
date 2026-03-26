@@ -59,10 +59,8 @@ export async function inviteVeterinario(
 
 export async function verifyVeterinario(vetId: string): Promise<ActionResult> {
   const supabase = await createClient()
-
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autenticado.' }
-
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
@@ -81,6 +79,7 @@ export async function verifyVeterinario(vetId: string): Promise<ActionResult> {
     .eq('id', vetId)
     .single()
 
+  console.log('[VerifyVeterinario]: ', existing)
   if (!existing) {
     // Crear el registro con is_verified=true
     const { error } = await supabase
@@ -99,6 +98,7 @@ export async function verifyVeterinario(vetId: string): Promise<ActionResult> {
   }
 
   revalidatePath('/dashboard/admin')
+  revalidatePath('/dashboard/admin/veterinarios')
   return { success: true }
 }
 

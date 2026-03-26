@@ -17,7 +17,9 @@ export function VerifyVetButton({ vetId, vetName }: VerifyVetButtonProps) {
 
   const handleVerify = () => {
     startTransition(async () => {
+      console.log("[handleVerify]")
       const result = await verifyVeterinario(vetId)
+      console.log("[handleVerify - ]: ", result)
 
       if ('error' in result) {
         toast.error(result.error)

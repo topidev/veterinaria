@@ -34,7 +34,6 @@ export default async function AdminVeterinariosPage() {
     .eq('role', 'veterinario')
     .order('created_at', { ascending: false })
 
-  console.log('[Veterinarios]: ', vets)
 
   return (
     <div className="space-y-6 w-full m-auto max-w-375">

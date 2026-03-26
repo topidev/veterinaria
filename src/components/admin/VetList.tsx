@@ -1,9 +1,8 @@
 'use client'
 
 import { verifyVeterinario, toggleUserActive } from "@/lib/actions/admin"
-import { AvatarImage, AvatarFallback } from "@ark-ui/react"
 import { ShieldCheck, ShieldAlert, UserX, UserCheck, ChevronUp, ChevronDown } from "lucide-react"
-import { Avatar } from "@/components/ui/avatar"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "../ui/badge"
 import { useState, useTransition } from "react"
 import { toast } from "sonner"

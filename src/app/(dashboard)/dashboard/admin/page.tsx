@@ -87,7 +87,7 @@ export default async function AdminDashboardPage() {
   )
 
   return (
-    <div className="space-y-6 w-full m-auto max-w-[1500px]">
+    <div className="space-y-6 w-full m-auto max-w-375">
 
       {/* Header */}
       <div className="flex items-center gap-2 justify-between flex-col text-center md:flex-row md:text-left">
@@ -130,7 +130,7 @@ export default async function AdminDashboardPage() {
         <Card className="w-full">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Clock className="h-4 w-4"/>
+              <Clock className="h-4 w-4" />
               Actividad reciente
             </CardTitle>
           </CardHeader>
@@ -168,7 +168,7 @@ export default async function AdminDashboardPage() {
             <p className="text-xs text-muted-foreground mt-1">Registrados activos</p>
           </CardContent>
         </Card>
-        
+
         <Card className="w-full">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -247,7 +247,7 @@ export default async function AdminDashboardPage() {
             )}
           </CardContent>
         </Card>
-         <Card className="w-full">
+        <Card className="w-full">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Stethoscope className="h-4 w-4" />
