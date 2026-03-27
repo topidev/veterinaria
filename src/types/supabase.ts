@@ -14,6 +14,121 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointment_services: {
+        Row: {
+          appointment_id: string
+          id: string
+          price_at_time: number
+          quantity: number
+          service_id: string
+        }
+        Insert: {
+          appointment_id: string
+          id?: string
+          price_at_time: number
+          quantity?: number
+          service_id: string
+        }
+        Update: {
+          appointment_id?: string
+          id?: string
+          price_at_time?: number
+          quantity?: number
+          service_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_services_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      appointments: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          pet_id: string
+          scheduled_date: string
+          scheduled_time: string
+          status: Database["public"]["Enums"]["appointment_status"]
+          subtotal: number
+          total: number
+          type: Database["public"]["Enums"]["appointment_type"]
+          updated_at: string
+          vet_id: string
+          vet_notes: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          pet_id: string
+          scheduled_date: string
+          scheduled_time: string
+          status?: Database["public"]["Enums"]["appointment_status"]
+          subtotal?: number
+          total?: number
+          type?: Database["public"]["Enums"]["appointment_type"]
+          updated_at?: string
+          vet_id: string
+          vet_notes?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          pet_id?: string
+          scheduled_date?: string
+          scheduled_time?: string
+          status?: Database["public"]["Enums"]["appointment_status"]
+          subtotal?: number
+          total?: number
+          type?: Database["public"]["Enums"]["appointment_type"]
+          updated_at?: string
+          vet_id?: string
+          vet_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_vet_id_fkey"
+            columns: ["vet_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cliente_profiles: {
         Row: {
           address: string | null
@@ -142,6 +257,77 @@ export type Database = {
         }
         Relationships: []
       }
+      services: {
+        Row: {
+          base_price: number
+          category: string
+          created_at: string
+          description: string | null
+          duration_minutes: number
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          base_price: number
+          category?: string
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          base_price?: number
+          category?: string
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      vet_schedules: {
+        Row: {
+          day_of_week: number
+          end_time: string
+          id: string
+          is_active: boolean
+          slot_duration: number
+          start_time: string
+          vet_id: string
+        }
+        Insert: {
+          day_of_week: number
+          end_time: string
+          id?: string
+          is_active?: boolean
+          slot_duration?: number
+          start_time: string
+          vet_id: string
+        }
+        Update: {
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          is_active?: boolean
+          slot_duration?: number
+          start_time?: string
+          vet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vet_schedules_vet_id_fkey"
+            columns: ["vet_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       veterinario_profiles: {
         Row: {
           bio: string | null
@@ -188,6 +374,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      appointment_status:
+      | "pending"
+      | "confirmed"
+      | "in_progress"
+      | "completed"
+      | "cancelled"
+      appointment_type: "scheduled" | "walk_in"
+      payment_status: "pending" | "paid" | "refunded"
       pet_sex: "male" | "female"
       pet_species: "dog" | "cat" | "bird" | "rabbit" | "other"
       user_role: "admin" | "veterinario" | "cliente"
@@ -315,28 +509,41 @@ export type CompositeTypes<
   ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
   : never
 
+// Agregar al final de src/types/supabase.ts
+
+export type Service = Tables<'services'>
+export type ServiceInsert = TablesInsert<'services'>
+
+export type VetSchedule = Tables<'vet_schedules'>
+export type VetScheduleInsert = TablesInsert<'vet_schedules'>
+
+export type Appointment = Tables<'appointments'>
+export type AppointmentInsert = TablesInsert<'appointments'>
+export type AppointmentUpdate = TablesUpdate<'appointments'>
+
+export type AppointmentService = Tables<'appointment_services'>
+export type AppointmentServiceInsert = TablesInsert<'appointment_services'>
+
+// ENUMs nuevos
+export type AppointmentStatus = Enums<'appointment_status'>
+export type AppointmentType = Enums<'appointment_type'>
+export type PaymentStatus = Enums<'payment_status'>
+
 export const Constants = {
   public: {
     Enums: {
+      appointment_status: [
+        "pending",
+        "confirmed",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ],
+      appointment_type: ["scheduled", "walk_in"],
+      payment_status: ["pending", "paid", "refunded"],
       pet_sex: ["male", "female"],
       pet_species: ["dog", "cat", "bird", "rabbit", "other"],
       user_role: ["admin", "veterinario", "cliente"],
     },
   },
 } as const
-
-// Agrega esto al FINAL del supabase.ts generado
-export type Profile = Tables<'profiles'>
-export type ProfileInsert = TablesInsert<'profiles'>
-export type ProfileUpdate = TablesUpdate<'profiles'>
-
-export type VetProfile = Tables<'veterinario_profiles'>
-export type ClienteProfile = Tables<'cliente_profiles'>
-
-export type Pet = Tables<'pets'>
-export type PetInsert = TablesInsert<'pets'>
-export type PetUpdate = TablesUpdate<'pets'>
-
-export type UserRole = Enums<'user_role'>
-export type PetSpecies = Enums<'pet_species'>
-export type PetSex = Enums<'pet_sex'>

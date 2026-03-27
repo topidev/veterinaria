@@ -1,0 +1,161 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); padding: 1rem 0; }
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.tab { font-size: 12px; padding: 6px 14px; cursor: pointer; color: var(--color-text-secondary); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab.active { color: var(--color-text-primary); border-bottom-color: var(--color-text-primary); font-weight: 500; }
+.panel { display: none; }
+.panel.active { display: block; }
+.table-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); margin-bottom: 12px; overflow: hidden; }
+.table-header { padding: 8px 12px; display: flex; align-items: center; gap: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.tname { font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 4px; }
+.rls { font-size: 10px; margin-left: auto; padding: 2px 7px; border-radius: 100px; background: var(--color-background-success); color: var(--color-text-success); }
+table.erd { width: 100%; border-collapse: collapse; font-size: 12px; }
+table.erd th { text-align: left; font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); padding: 4px 10px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+table.erd td { padding: 5px 10px; border-bottom: 0.5px solid var(--color-border-tertiary); vertical-align: middle; }
+table.erd tr:last-child td { border-bottom: none; }
+.col-name { font-family: var(--font-mono); font-size: 11px; }
+.col-type { font-size: 11px; color: var(--color-text-tertiary); }
+.col-note { font-size: 11px; color: var(--color-text-secondary); }
+.pk { font-size: 10px; background: var(--color-background-info); color: var(--color-text-info); padding: 1px 5px; border-radius: 3px; }
+.fk { font-size: 10px; background: var(--color-background-warning); color: var(--color-text-warning); padding: 1px 5px; border-radius: 3px; }
+.why-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px 14px; margin-bottom: 10px; background: var(--color-background-secondary); }
+.why-title { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+.why-text { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+.why-code { font-family: var(--font-mono); font-size: 11px; background: var(--color-background-tertiary); padding: 6px 10px; border-radius: 4px; margin-top: 6px; color: var(--color-text-secondary); }
+.bad { color: var(--color-text-danger); }
+.good { color: var(--color-text-success); }
+</style>
+
+<div class="tabs">
+  <div class="tab active" onclick="show('tablas')">Tablas</div>
+  <div class="tab" onclick="show('por-que')">Por qué así</div>
+</div>
+
+<!-- TABLAS -->
+<div class="panel active" id="panel-tablas">
+
+  <!-- services -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="tname" style="background:#EAF3DE;color:#27500A">🏥 services</span>
+      <span style="font-size:11px;color:var(--color-text-tertiary)">Catálogo de servicios de la clínica</span>
+      <span class="rls">RLS</span>
+    </div>
+    <table class="erd">
+      <tr><th>Columna</th><th>Tipo</th><th>Nota</th></tr>
+      <tr><td><span class="col-name">id</span></td><td><span class="col-type">uuid</span></td><td><span class="col-note"><span class="pk">PK</span></span></td></tr>
+      <tr><td><span class="col-name">name</span></td><td><span class="col-type">text</span></td><td><span class="col-note">Desparasitación, Vacuna, Baño, Consulta...</span></td></tr>
+      <tr><td><span class="col-name">description</span></td><td><span class="col-type">text</span></td><td><span class="col-note">Descripción visible al cliente</span></td></tr>
+      <tr><td><span class="col-name">base_price</span></td><td><span class="col-type">numeric(10,2)</span></td><td><span class="col-note">Precio base del servicio</span></td></tr>
+      <tr><td><span class="col-name">duration_minutes</span></td><td><span class="col-type">integer</span></td><td><span class="col-note">Duración estimada — para bloquear agenda</span></td></tr>
+      <tr><td><span class="col-name">category</span></td><td><span class="col-type">text</span></td><td><span class="col-note">consulta | grooming | vacuna | cirugia | otro</span></td></tr>
+      <tr><td><span class="col-name">is_active</span></td><td><span class="col-type">boolean</span></td><td><span class="col-note">Para desactivar sin borrar</span></td></tr>
+    </table>
+  </div>
+
+  <!-- vet_schedules -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="tname" style="background:#E6F1FB;color:#0C447C">📅 vet_schedules</span>
+      <span style="font-size:11px;color:var(--color-text-tertiary)">Horario fijo por veterinario</span>
+      <span class="rls">RLS</span>
+    </div>
+    <table class="erd">
+      <tr><th>Columna</th><th>Tipo</th><th>Nota</th></tr>
+      <tr><td><span class="col-name">id</span></td><td><span class="col-type">uuid</span></td><td><span class="col-note"><span class="pk">PK</span></span></td></tr>
+      <tr><td><span class="col-name">vet_id</span></td><td><span class="col-type">uuid</span></td><td><span class="col-note"><span class="fk">FK</span> → profiles.id</span></td></tr>
+      <tr><td><span class="col-name">day_of_week</span></td><td><span class="col-type">integer</span></td><td><span class="col-note">0=Dom, 1=Lun... 6=Sáb</span></td></tr>
+      <tr><td><span class="col-name">start_time</span></td><td><span class="col-type">time</span></td><td><span class="col-note">08:00 matutino / 14:00 vespertino</span></td></tr>
+      <tr><td><span class="col-name">end_time</span></td><td><span class="col-type">time</span></td><td><span class="col-note">14:00 / 20:00</span></td></tr>
+      <tr><td><span class="col-name">slot_duration</span></td><td><span class="col-type">integer</span></td><td><span class="col-note">Minutos por cita (30 o 60)</span></td></tr>
+      <tr><td><span class="col-name">is_active</span></td><td><span class="col-type">boolean</span></td><td><span class="col-note">Para días sin consulta</span></td></tr>
+    </table>
+  </div>
+
+  <!-- appointments -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="tname" style="background:#EEEDFE;color:#3C3489">🗓 appointments</span>
+      <span style="font-size:11px;color:var(--color-text-tertiary)">La cita en sí</span>
+      <span class="rls">RLS</span>
+    </div>
+    <table class="erd">
+      <tr><th>Columna</th><th>Tipo</th><th>Nota</th></tr>
+      <tr><td><span class="col-name">id</span></td><td><span class="col-type">uuid</span></td><td><span class="col-note"><span class="pk">PK</span></span></td></tr>
+      <tr><td><span class="col-name">client_id</span></td><td><span class="col-type">uuid</span></td><td><span class="col-note"><span class="fk">FK</span> → profiles.id</span></td></tr>
+      <tr><td><span class="col-name">pet_id</span></td><td><span class="col-type">uuid</span></td><td><span class="col-note"><span class="fk">FK</span> → pets.id</span></td></tr>
+      <tr><td><span class="col-name">vet_id</span></td><td><span class="col-type">uuid</span></td><td><span class="col-note"><span class="fk">FK</span> → profiles.id</span></td></tr>
+      <tr><td><span class="col-name">scheduled_date</span></td><td><span class="col-type">date</span></td><td><span class="col-note">Fecha de la cita</span></td></tr>
+      <tr><td><span class="col-name">scheduled_time</span></td><td><span class="col-type">time</span></td><td><span class="col-note">Hora de inicio</span></td></tr>
+      <tr><td><span class="col-name">status</span></td><td><span class="col-type">appointment_status</span></td><td><span class="col-note">ENUM — ver abajo</span></td></tr>
+      <tr><td><span class="col-name">type</span></td><td><span class="col-type">appointment_type</span></td><td><span class="col-note">scheduled | walk_in (emergencia)</span></td></tr>
+      <tr><td><span class="col-name">notes</span></td><td><span class="col-type">text</span></td><td><span class="col-note">Notas del cliente al agendar</span></td></tr>
+      <tr><td><span class="col-name">vet_notes</span></td><td><span class="col-type">text</span></td><td><span class="col-note">Notas del vet durante/después</span></td></tr>
+      <tr><td><span class="col-name">subtotal</span></td><td><span class="col-type">numeric(10,2)</span></td><td><span class="col-note">Suma de appointment_services</span></td></tr>
+      <tr><td><span class="col-name">total</span></td><td><span class="col-type">numeric(10,2)</span></td><td><span class="col-note">= subtotal (sin descuentos por ahora)</span></td></tr>
+      <tr><td><span class="col-name">payment_status</span></td><td><span class="col-type">payment_status</span></td><td><span class="col-note">pending | paid | refunded</span></td></tr>
+      <tr><td><span class="col-name">created_at</span></td><td><span class="col-type">timestamptz</span></td><td><span class="col-note">Default now()</span></td></tr>
+    </table>
+  </div>
+
+  <!-- appointment_services -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="tname" style="background:#FAEEDA;color:#633806">🔗 appointment_services</span>
+      <span style="font-size:11px;color:var(--color-text-tertiary)">Tabla intermedia — servicios de cada cita</span>
+      <span class="rls">RLS</span>
+    </div>
+    <table class="erd">
+      <tr><th>Columna</th><th>Tipo</th><th>Nota</th></tr>
+      <tr><td><span class="col-name">id</span></td><td><span class="col-type">uuid</span></td><td><span class="col-note"><span class="pk">PK</span></span></td></tr>
+      <tr><td><span class="col-name">appointment_id</span></td><td><span class="col-type">uuid</span></td><td><span class="col-note"><span class="fk">FK</span> → appointments.id CASCADE</span></td></tr>
+      <tr><td><span class="col-name">service_id</span></td><td><span class="col-type">uuid</span></td><td><span class="col-note"><span class="fk">FK</span> → services.id</span></td></tr>
+      <tr><td><span class="col-name">price_at_time</span></td><td><span class="col-type">numeric(10,2)</span></td><td><span class="col-note">Precio del servicio en ese momento</span></td></tr>
+      <tr><td><span class="col-name">quantity</span></td><td><span class="col-type">integer</span></td><td><span class="col-note">Default 1 — para medicamentos múltiples</span></td></tr>
+    </table>
+  </div>
+
+</div>
+
+<!-- POR QUÉ -->
+<div class="panel" id="panel-por-que">
+
+  <div class="why-card">
+    <div class="why-title">¿Por qué tabla intermedia y no services[] en appointments?</div>
+    <div class="why-text">Tu propuesta original tenía <code>services</code> como campo en <code>appointments</code>. Si fuera un array JSON o un text[], pierdes la capacidad de hacer queries útiles.</div>
+    <div class="why-code bad">❌ SELECT * FROM appointments WHERE 'Baño' = ANY(services) -- frágil<br>❌ No puedes joinear con la tabla services para obtener el precio<br>❌ No puedes calcular "cuánto generó el servicio de baño este mes"</div>
+    <div class="why-code good">✓ SELECT SUM(price_at_time) FROM appointment_services WHERE service_id = 'uuid-baño'<br>✓ JOINs limpios, índices eficientes, queries analíticas posibles</div>
+  </div>
+
+  <div class="why-card">
+    <div class="why-title">¿Por qué price_at_time en appointment_services?</div>
+    <div class="why-text">Si el precio de "Baño" cambia de $200 a $250, las citas anteriores deben conservar el precio que tenían. Si solo guardas el service_id y lees el precio de la tabla services, todas las citas históricas mostrarían $250 aunque se cobraron a $200.</div>
+    <div class="why-code good">✓ price_at_time = snapshot del precio en el momento de la cita<br>✓ Historial de pagos siempre correcto aunque cambien los precios</div>
+  </div>
+
+  <div class="why-card">
+    <div class="why-title">¿Por qué vet_schedules separado?</div>
+    <div class="why-text">La disponibilidad del vet no pertenece a ninguna cita en particular — es información del vet que existe independientemente. Al tener tabla separada puedes calcular slots disponibles haciendo un query de "horario del vet MINUS citas ya agendadas".</div>
+  </div>
+
+  <div class="why-card">
+    <div class="why-title">ENUMs necesarios</div>
+    <div class="why-code">
+appointment_status: pending | confirmed | in_progress | completed | cancelled<br>
+appointment_type:   scheduled | walk_in<br>
+payment_status:     pending | paid | refunded
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+  document.querySelector(`.tab[onclick="show('${tab}')"]`).classList.add('active')
+  document.getElementById('panel-' + tab).classList.add('active')
+}
+</script>
