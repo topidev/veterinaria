@@ -29,6 +29,15 @@ export default async function AdminVeterinariosPage() {
         years_experience,
         consultation_fee,
         bio
+      ),
+      vet_schedules (
+        id,
+        day_of_week,
+        start_time,
+        end_time,
+        slot_duration,
+        is_active,
+        vet_id
       )
     `)
     .eq('role', 'veterinario')
