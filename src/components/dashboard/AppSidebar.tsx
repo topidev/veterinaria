@@ -47,6 +47,7 @@ const NAV_ITEMS: Record<UserRole, { label: string; href: string; icon: React.Ele
     { label: 'Reservaciones', href: '/reservaciones', icon: CalendarDays },
     { label: 'Pagos', href: '/pagos', icon: CreditCard },
     { label: 'Configuración', href: '/dashboard/admin/config', icon: Settings },
+    { label: 'Servicios', href: '/dashboard/admin/servicios', icon: Stethoscope },
   ],
   veterinario: [
     { label: 'Dashboard', href: '/dashboard/veterinario', icon: LayoutDashboard },
