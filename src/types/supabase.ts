@@ -511,23 +511,32 @@ export type CompositeTypes<
 
 // Agregar al final de src/types/supabase.ts
 
-export type Service = Tables<'services'>
-export type ServiceInsert = TablesInsert<'services'>
+// ─── Aliases Sprint 0-1 ───────────────────────────────────────────────────────
+export type Profile         = Tables<'profiles'>
+export type ProfileInsert   = TablesInsert<'profiles'>
+export type ProfileUpdate   = TablesUpdate<'profiles'>
+export type VetProfile      = Tables<'veterinario_profiles'>
+export type ClienteProfile  = Tables<'cliente_profiles'>
+export type Pet             = Tables<'pets'>
+export type PetInsert       = TablesInsert<'pets'>
+export type PetUpdate       = TablesUpdate<'pets'>
+export type UserRole        = Enums<'user_role'>
+export type PetSpecies      = Enums<'pet_species'>
+export type PetSex          = Enums<'pet_sex'>
 
-export type VetSchedule = Tables<'vet_schedules'>
-export type VetScheduleInsert = TablesInsert<'vet_schedules'>
-
-export type Appointment = Tables<'appointments'>
-export type AppointmentInsert = TablesInsert<'appointments'>
-export type AppointmentUpdate = TablesUpdate<'appointments'>
-
-export type AppointmentService = Tables<'appointment_services'>
+// ─── Aliases Sprint 3 ─────────────────────────────────────────────────────────
+export type Service                = Tables<'services'>
+export type ServiceInsert          = TablesInsert<'services'>
+export type VetSchedule            = Tables<'vet_schedules'>
+export type VetScheduleInsert      = TablesInsert<'vet_schedules'>
+export type Appointment            = Tables<'appointments'>
+export type AppointmentInsert      = TablesInsert<'appointments'>
+export type AppointmentUpdate      = TablesUpdate<'appointments'>
+export type AppointmentService     = Tables<'appointment_services'>
 export type AppointmentServiceInsert = TablesInsert<'appointment_services'>
-
-// ENUMs nuevos
-export type AppointmentStatus = Enums<'appointment_status'>
-export type AppointmentType = Enums<'appointment_type'>
-export type PaymentStatus = Enums<'payment_status'>
+export type AppointmentStatus      = Enums<'appointment_status'>
+export type AppointmentType        = Enums<'appointment_type'>
+export type PaymentStatus          = Enums<'payment_status'>
 
 export const Constants = {
   public: {
