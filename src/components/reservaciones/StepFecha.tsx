@@ -4,9 +4,9 @@
 import { useMemo } from 'react'
 import type { VetOption } from './BookingFlow'
 
-const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
-const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
-               'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
 interface StepFechaProps {
   vetId: string
@@ -18,6 +18,7 @@ interface StepFechaProps {
 export function StepFecha({ vetId, vets, selectedDate, onSelect }: StepFechaProps) {
   const vet = vets.find((v) => v.id === vetId)
   const activeDays = new Set(vet?.vet_schedules.map((s) => s.day_of_week) ?? [])
+  console.log(activeDays)
 
   // Generar los próximos 30 días
   const days = useMemo(() => {
@@ -47,13 +48,36 @@ export function StepFecha({ vetId, vets, selectedDate, onSelect }: StepFechaProp
   // Agrupar por semanas para mostrar como calendario
   const weeks: typeof days[] = []
   let week: typeof days = []
+  const empty_days_count = days[0].dayOfWeek;
+  let hasEmptyDays = (empty_days_count != 0)
   days.forEach((day, i) => {
-    week.push(day)
+    if (weeks.length === 0 && hasEmptyDays) {
+      console.log(`[Insertando ${empty_days_count} Días Vacios]`)
+      for (let x = 0; x < empty_days_count; x++) {
+        week.push({
+          date: "",
+          dayOfWeek: x,
+          label: 0,
+          dayLabel: "dummy",
+          isAvailable: false,
+          isToday: false,
+          month: "dummy",
+          monthChanged: false,
+        })
+      }
+      hasEmptyDays = false
+    }
+    else {
+      week.push(day)
+    }
     if (week.length === 7 || i === days.length - 1) {
       weeks.push([...week])
       week = []
     }
   })
+
+
+  console.log("[_Días]: ", weeks)
 
   return (
     <div className="space-y-3">
@@ -72,28 +96,27 @@ export function StepFecha({ vetId, vets, selectedDate, onSelect }: StepFechaProp
 
         {weeks.map((week, wi) => (
           <div key={wi} className="grid grid-cols-7 border-b last:border-b-0">
-            {week.map((day) => (
+            {week.map((day, i) => (
               <button
                 key={day.date}
                 type="button"
                 disabled={!day.isAvailable}
                 onClick={() => day.isAvailable && onSelect(day.date)}
                 className={`
-                  py-3 text-sm transition-colors relative
+                  py-3 text-sm transition-colors relative cursor-pointer
                   ${!day.isAvailable
-                    ? 'text-muted-foreground/30 cursor-not-allowed'
+                    ? 'text-gray-700 cursor-not-allowed'
                     : selectedDate === day.date
-                    ? 'bg-primary text-primary-foreground font-medium'
-                    : 'hover:bg-muted cursor-pointer'
+                      ? 'bg-primary text-primary-foreground font-medium'
+                      : 'hover:bg-muted'
                   }
                   ${day.isToday && selectedDate !== day.date ? 'font-semibold' : ''}
                 `}
               >
-                {day.label}
+                {day.label === 0 ? "-" : day.label}
                 {day.isToday && (
-                  <span className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full ${
-                    selectedDate === day.date ? 'bg-primary-foreground' : 'bg-primary'
-                  }`} />
+                  <span className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full ${selectedDate === day.date ? 'bg-primary-foreground' : 'bg-primary'
+                    }`} />
                 )}
               </button>
             ))}

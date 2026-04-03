@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { CalendarDays, MessageSquare, TrendingUp, User, Clock, CheckCircle2 } from 'lucide-react'
+import { AppointmentCard } from '@/components/veterinario/AppointmentCard'
 
 export const metadata: Metadata = { title: 'Mi Agenda' }
 
@@ -17,7 +18,15 @@ export default async function VeterinarioDashboardPage() {
 
   if (!user) redirect('/login')
 
-  const [{ data: profile }, { data: vetProfile }] = await Promise.all([
+  const today = new Date().toISOString().split('T')[0]
+  const firstOfMonth = today.slice(0, 7) + '-01'
+
+  const [
+    { data: profile },
+    { data: vetProfile },
+    { data: todayAppts },
+    { count: monthCount }
+  ] = await Promise.all([
     supabase
       .from('profiles')
       .select('full_name')
@@ -28,15 +37,38 @@ export default async function VeterinarioDashboardPage() {
       .select('specialty, consultation_fee, years_experience, is_verified, bio')
       .eq('id', user.id)
       .single(),
+    supabase
+      .from('appointments')
+      .select(`
+        id, scheduled_time, status, type, notes, vet_notes, total,
+        pets: pet_id (name, species),
+        client:client_id (full_name),
+        appointment_services(
+          price_at_time, quantity,
+          services:service_id(name)
+        )
+      `)
+      .eq('vet_id', user.id)
+      .eq('scheduled_date', today)
+      .not('status', 'eq', 'cancelled')
+      .order('scheduled_time'),
+    supabase
+      .from('appointments')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'completed')
+      .eq('vet_id', user.id)
+      .gte('schedule_date', firstOfMonth)
   ])
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'Dogtor'
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Buenos días' : hour < 18 ? 'Buenas tarde' : 'Buenas noches'
+  const appts = todayAppts ?? []
+  const pending = appts.filter((a) => ['pending', 'confirmed'].includes(a.status))
 
   return (
-    <div className="space-y-6 w-full m-auto max-w-[1500px]">
+    <div className="space-y-6 w-full m-auto max-w-375">
 
       {/* Header */}
       <div className="flex items-start justify-between gap-2 flex-col md:flex-row">
@@ -60,13 +92,14 @@ export default async function VeterinarioDashboardPage() {
         <Card className='w-full'>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <CalendarDays className="h-4 w-4" />
-              Citas hoy
+              <CalendarDays className="h-4 w-4" />Citas hoy
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold">—</p>
-            <p className="text-xs text-muted-foreground mt-1">Disponible en Sprint 3</p>
+            <p className="text-2xl font-semibold">{appts.length}</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {pending.length} pendiente{pending.length !== 1 ? 's' : ''}
+            </p>
           </CardContent>
         </Card>
 
@@ -86,13 +119,12 @@ export default async function VeterinarioDashboardPage() {
         <Card className='w-full'>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Consultas este mes
+              <TrendingUp className="h-4 w-4" />Consultas este mes
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold">—</p>
-            <p className="text-xs text-muted-foreground mt-1">Disponible en Sprint 3</p>
+            <p className="text-2xl font-semibold">{monthCount ?? 0}</p>
+            <p className="text-xs text-muted-foreground mt-1">Completadas</p>
           </CardContent>
         </Card>
       </div>
@@ -102,19 +134,29 @@ export default async function VeterinarioDashboardPage() {
         {/* Agenda del día — placeholder */}
         <Card className="w-full md:w-2/3">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-base">Agenda del día</CardTitle>
+            <CardTitle className="text-base">Agenda de hoy</CardTitle>
             <Button variant="outline" size="sm" asChild>
-              <Link href="/dashboard/veterinario/agenda">Ver agenda</Link>
+              <Link href="/dashboard/veterinario/agenda">Ver completa</Link>
             </Button>
           </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <CalendarDays className="h-10 w-10 text-muted-foreground/30 mb-3" />
-              <p className="text-sm font-medium">Sin citas para hoy</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Las citas aparecerán aquí en Sprint 3
-              </p>
-            </div>
+          <CardContent className="space-y-3 p-4 pt-0">
+            {appts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <CalendarDays className="h-10 w-10 text-muted-foreground/30 mb-3" />
+                <p className="text-sm font-medium">Sin citas hoy</p>
+              </div>
+            ) : (
+              appts.slice(0, 3).map((a) => (
+                <AppointmentCard key={a.id} appointment={a as any} />
+              ))
+            )}
+            {appts.length > 3 && (
+              <Button variant="ghost" size="sm" className="w-full" asChild>
+                <Link href="/dashboard/veterinario/agenda">
+                  Ver {appts.length - 3} más
+                </Link>
+              </Button>
+            )}
           </CardContent>
         </Card>
 

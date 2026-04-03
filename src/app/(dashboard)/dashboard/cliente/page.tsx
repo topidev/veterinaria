@@ -3,12 +3,29 @@ import { PetCard } from '@/components/mascotas/PetCard'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/server'
-import { CalendarDays, PawPrint, Plus } from 'lucide-react'
+import { CalendarDays, Clock, PawPrint, Plus } from 'lucide-react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { Badge } from '@/components/ui/badge'
 
 export const metadata: Metadata = { title: 'Mi dashboard' }
+
+const STATUS_LABELS: Record<string, string> = {
+  pending: 'Pendiente',
+  confirmed: 'Confirmada',
+  in_progress: 'En atención',
+  completed: 'Completada',
+  cancelled: 'Cancelada',
+}
+
+const STATUS_COLORS: Record<string, string> = {
+  pending: 'text-amber-600 border-amber-300',
+  confirmed: 'text-blue-600 border-blue-300',
+  in_progress: 'text-purple-600 border-purple-300',
+  completed: 'text-green-600 border-green-300',
+  cancelled: 'text-red-600 border-red-300',
+}
 
 export default async function ClienteDashboardPage() {
 
@@ -18,8 +35,14 @@ export default async function ClienteDashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const today = new Date().toISOString().split("T")[0]
+
   // Buscamos en paralelo en Supabase
-  const [{ data: profile }, { data: pets }] = await Promise.all([
+  const [
+    { data: profile },
+    { data: pets },
+    { data: nextAppointment }
+  ] = await Promise.all([
     supabase
       .from('profiles')
       .select('full_name')
@@ -30,7 +53,24 @@ export default async function ClienteDashboardPage() {
       .select('*')
       .eq('owner_id', user.id)
       .eq('is_active', true)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('appointments')
+      .select(`
+        id,
+        scheduled_date,
+        scheduled_time,
+        status,
+        pets: pet_id (name),
+        vet:vet_id (full_name)
+      `)
+      .eq('client_id', user.id)
+      .gte('scheduled_date', today)
+      .not('status', 'eq', 'cancelled')
+      .order('scheduled_date', { ascending: true })
+      .order('scheduled_time', { ascending: true })
+      .limit(1)
+      .maybeSingle()
   ])
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'Client'
@@ -80,12 +120,42 @@ export default async function ClienteDashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-2">
-              <CalendarDays className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                Sin citas agendadas
-              </span>
-            </div>
+            {nextAppointment ? (
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <CalendarDays className="h-5 w-5 text-muted-foreground shrink-0" />
+                  <div>
+                    <p className="font-medium text-sm">
+                      {(nextAppointment.pets as any)?.name} con{' '}
+                      Dr. {(nextAppointment.vet as any)?.full_name?.split(' ')[0]}
+                    </p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                      <Clock className="h-3 w-3" />
+                      {new Date(nextAppointment.scheduled_date + 'T12:00:00')
+                        .toLocaleDateString('es-MX', {
+                          weekday: 'short', month: 'short', day: 'numeric'
+                        })}
+                      {' · '}
+                      {nextAppointment.scheduled_time.slice(0, 5)} hrs
+                    </p>
+                  </div>
+                </div>
+                <Badge
+                  variant="outline"
+                  className={`text-xs shrink-0 ${STATUS_COLORS[nextAppointment.status]}`}
+                >
+                  {STATUS_LABELS[nextAppointment.status]}
+                </Badge>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <CalendarDays className="h-5 w-5" />
+                <span className="text-sm">Sin citas próximas</span>
+                <Button variant="link" size="sm" className="h-auto p-0 ml-1" asChild>
+                  <Link href="/reservaciones">Agendar ahora</Link>
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

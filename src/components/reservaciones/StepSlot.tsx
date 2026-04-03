@@ -75,7 +75,7 @@ export function StepSlot({ vetId, date, selectedTime, onSelect }: StepSlotProps)
             type="button"
             onClick={() => onSelect(slot)}
             className={`
-              py-2.5 rounded-lg text-sm font-medium border transition-colors
+              py-2.5 rounded-lg text-sm font-medium border transition-all duration-350 cursor-pointer
               ${selectedTime === slot
                 ? 'bg-primary text-primary-foreground border-primary'
                 : 'bg-background border-border hover:border-primary hover:text-primary'

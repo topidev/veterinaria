@@ -13,17 +13,17 @@ import { CalendarDays, Clock, User, PawPrint } from 'lucide-react'
 import type { Service, Pet } from '@/types/supabase'
 import type { BookingState } from './BookingFlow'
 
-const DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
-const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']
+const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
 
 interface StepConfirmarProps {
-  booking:        BookingState
-  services:       Service[]
-  pets:           Pet[]
+  booking: BookingState
+  services: Service[]
+  pets: Pet[]
   selectedPetId?: string
-  notes:          string
-  onPetChange:    (petId: string, petName: string) => void
-  onNotesChange:  (notes: string) => void
+  notes: string
+  onPetChange: (petId: string, petName: string) => void
+  onNotesChange: (notes: string) => void
 }
 
 export function StepConfirmar({

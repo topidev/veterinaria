@@ -13,6 +13,23 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Panel de administración' }
 
+const STATUS_LABELS: Record<string, string> = {
+  pending: "Pendiente",
+  confirmed: "Confirmada",
+  in_progress: "En atención",
+  completed: "Completada",
+  canceled: "Cancelada",
+}
+
+const STATUS_COLORS: Record<string, string> = {
+  pending: "text-amber-600, border-amber-300",
+  confirmed: "text-blue-600, border-blue-300",
+  in_progress: "text-purple-600, border-purple-300",
+  completed: "text-green-600, border-green-300",
+  canceled: "text-red-600, border-red-300",
+}
+
+
 function getInitials(name: string | null) {
   if (!name) return '?'
   return name.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
@@ -34,11 +51,17 @@ export default async function AdminDashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const today = new Date().toISOString().split('T')[0]
+  const firstOfMonth = today.slice(0, 7) + '-01'
+
   // Todas las queries en paralelo
   const [
     { count: totalClientes },
     { count: totalVets },
+    { count: citasHoy },
+    { data: ingresosMes },
     { data: vets },
+    { data: citasDelDia },
     { data: recentUsers },
   ] = await Promise.all([
     // Total clientes
@@ -54,6 +77,18 @@ export default async function AdminDashboardPage() {
       .select('*', { count: 'exact', head: true })
       .eq('role', 'veterinario')
       .eq('is_active', true),
+
+    // Total de citas hoy
+    supabase
+      .from("appointments")
+      .select("*", { count: 'exact', head: true })
+      .eq('schedule_date', today).not('status', 'eq', 'cancelled'),
+
+    // Ingresos del Mes
+    supabase
+      .from('appointments')
+      .select('total')
+      .eq('status', 'completed').gte('scheduled_date', firstOfMonth),
 
     // Lista de veterinarios con su perfil extendido
     supabase
@@ -73,6 +108,19 @@ export default async function AdminDashboardPage() {
       .eq('role', 'veterinario')
       .order('created_at', { ascending: false }),
 
+    // Citas del día - 5 primeras citas
+    supabase
+      .from('appointments')
+      .select(`
+        id, scheduled_time, status, total, 
+        pets:pet_id (name),
+        vet: vet_id (full_name),
+        client: client_id (full_name),
+      `)
+      .eq('scheduled_date', today)
+      .not('status', 'eq', 'cancelled')
+      .order('scheduled_date').limit(5),
+
     // Actividad reciente — últimos 5 usuarios registrados
     supabase
       .from('profiles')
@@ -81,10 +129,14 @@ export default async function AdminDashboardPage() {
       .limit(5),
   ])
 
+
+
   const vetList = vets ?? []
   const pendingVets = vetList.filter(
     (v) => !(v.veterinario_profiles as any)?.is_verified
   )
+  const totalIngresos = (ingresosMes ?? []).reduce((sum, a) => sum + Number(a.total), 0)
+
 
   return (
     <div className="space-y-6 w-full m-auto max-w-375">
@@ -114,15 +166,40 @@ export default async function AdminDashboardPage() {
       {/* Métricas reales */}
       <div className="flex items-stretch justify-between gap-2 flex-col md:flex-row">
         <Card className="w-full">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <CalendarDays className="h-4 w-4" />
-              Citas hoy
-            </CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <CardTitle className="text-base">Citas de hoy</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-semibold">—</p>
-            <p className="text-xs text-muted-foreground mt-1">Sprint 3</p>
+          <CardContent className="p-0">
+            {(citasDelDia ?? []).length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-10 text-center px-4">
+                <CalendarDays className="h-10 w-10 text-muted-foreground/30 mb-3" />
+                <p className="text-sm font-medium">Sin citas para hoy</p>
+              </div>
+            ) : (
+              <div className="divide-y">
+                {(citasDelDia ?? []).map((cita) => (
+                  <div key={cita.id} className="flex items-center gap-3 px-6 py-3">
+                    <span className="text-sm font-medium w-12 shrink-0">
+                      {cita.scheduled_time.slice(0, 5)}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">
+                        {(cita.pets as any)?.name} — {(cita.client as any)?.full_name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Dr. {(cita.vet as any)?.full_name}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className={`text-xs shrink-0 ${STATUS_COLORS[cita.status]}`}>
+                      {STATUS_LABELS[cita.status]}
+                    </Badge>
+                    <span className="text-sm font-medium shrink-0">
+                      ${Number(cita.total).toFixed(0)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -172,13 +249,14 @@ export default async function AdminDashboardPage() {
         <Card className="w-full">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
-              Ingresos mes
+              <DollarSign className="h-4 w-4" />Ingresos mes
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold">—</p>
-            <p className="text-xs text-muted-foreground mt-1">Sprint 4</p>
+            <p className="text-2xl font-semibold">
+              ${totalIngresos.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">Citas completadas</p>
           </CardContent>
         </Card>
       </div>
@@ -190,7 +268,7 @@ export default async function AdminDashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-base">Veterinarios</CardTitle>
             <Button variant="secondary" size="sm" asChild>
-              <Link href="/dashboard/admin/veterinarios">Ver todos</Link>
+              <Link href="/dashboard/admin/veterinarios">Ver todos ({totalVets})</Link>
             </Button>
           </CardHeader>
           <CardContent className="p-0">
@@ -248,7 +326,7 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
         <Card className="w-full">
-          <CardHeader className="pb-2">
+          {/* <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Stethoscope className="h-4 w-4" />
               Veterinarios
@@ -261,6 +339,15 @@ export default async function AdminDashboardPage() {
                 ? `${pendingVets.length} sin verificar`
                 : 'Todos verificados'}
             </p>
+          </CardContent> */}
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <CalendarDays className="h-4 w-4" />Total citas hoy
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-semibold">{citasHoy ?? 0}</p>
+            <p className="text-xs text-muted-foreground mt-1">Sin canceladas</p>
           </CardContent>
         </Card>
       </div>
