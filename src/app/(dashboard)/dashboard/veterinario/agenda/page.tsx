@@ -1,25 +1,60 @@
 // src/app/(dashboard)/dashboard/veterinario/agenda/page.tsx
+// Server Component — lee searchParams para saber qué semana mostrar
+// El WeekNavigator (Client) solo cambia la URL, este componente hace el fetch
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { AppointmentCard } from '@/components/veterinario/AppointmentCard'
-import { CalendarDays } from 'lucide-react'
+import { WeekNavigator } from '@/components/veterinario/WeekNavigator'
+import { DayColumn } from '@/components/veterinario/DayColumn'
 import type { Metadata } from 'next'
+import type { AppointmentWithDetails } from '@/components/veterinario/AppointmentCard'
 
 export const metadata: Metadata = { title: 'Mi agenda' }
 
-export default async function VetAgendaPage() {
+function getMonday(dateStr: string): string {
+  const date = new Date(dateStr + 'T12:00:00')
+  console.log("[Date]:",date)
+  const day = date.getUTCDay()
+  console.log("[Day]:",day)
+  const diff = day === 0 ? -6 : 1 -day
+  console.log("[Difference]:",diff)
+  date.setUTCDate(date.getUTCDate() +  diff)
+  console.log("[Date UTC]:",date)
+  
+  return date.toISOString().split('T')[0]
+}
+
+function addDays(dateStr: string, days: number): string {
+  const date = new Date(dateStr + 'T12:00:00')
+  date.setUTCDate(date.getUTCDate() + days)
+  return date.toISOString().split('T')[0]
+}
+
+interface AgendaPageProps {
+  searchParams: Promise<{ semana?: string }>
+}
+
+export default async function VetAgendaPage({ searchParams}: AgendaPageProps) {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  
+  const params = await searchParams
   // Fecha de hoy en formato YYYY-MM-DD
   const today = new Date().toISOString().split('T')[0]
+
+  const weekStart = params.semana
+    ? getMonday(params.semana)
+    : getMonday(today)
+  
+  const weekEnd = addDays(weekStart, 6)
 
   const { data: appointments } = await supabase
     .from('appointments')
     .select(`
       id,
+      scheduled_date,
       scheduled_time,
       status,
       type,
@@ -27,7 +62,7 @@ export default async function VetAgendaPage() {
       vet_notes,
       total,
       pets:pet_id ( name, species ),
-      client:client_id ( full_name ),
+      client:profiles!client_id ( full_name ),
       appointment_services (
         price_at_time,
         quantity,
@@ -35,73 +70,59 @@ export default async function VetAgendaPage() {
       )
     `)
     .eq('vet_id', user.id)
-    .eq('scheduled_date', today)
+    .gte('scheduled_date', weekStart)
+    .lte('scheduled_date', weekEnd)
     .order('scheduled_time', { ascending: true })
+  
+  console.log("[Appointments]: ", appointments)
 
-  const appts = appointments ?? []
+  // Agrupar citas por fecha para pasarlas a cada DayColumn
+  const apptsByDate = (appointments ?? []).reduce((acc, a) => {
+    const date = a.scheduled_date
+    if(!acc[date]) acc[date] = []
+    acc[date].push(a)
+    return acc
+  }, {} as Record<string, typeof appointments>)
 
-  // Separar por status para mostrar primero las activas
-  const active   = appts.filter((a) => !['completed', 'cancelled'].includes(a.status))
-  const finished = appts.filter((a) => ['completed', 'cancelled'].includes(a.status))
+  console.log("[Appointmets GroupBy Date]: ", apptsByDate)
+
+  const days = Array.from({ length: 7}, (_, i) => addDays(weekStart, i))
+
+  const totalSemana = (appointments ?? []).filter(
+    (a) => !['cancelled'].includes(a.status)
+  ).length
+
+  const completadas = (appointments ?? []).filter(
+    (a) => a.status === 'completed'
+  ).length
 
   return (
-    <div className="space-y-6 w-full max-w-375 m-auto">
-
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 w-full m-auto max-w-375">
+ 
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-semibold">Mi agenda</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {new Date().toLocaleDateString('es-MX', {
-              weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-            })}
+            {totalSemana} cita{totalSemana !== 1 ? 's' : ''} esta semana
+            {completadas > 0 && ` · ${completadas} completada${completadas !== 1 ? 's' : ''}`}
           </p>
         </div>
-
-        {/* Métricas rápidas del día */}
-        <div className="flex gap-4 text-center">
-          <div>
-            <p className="text-2xl font-semibold">{active.length}</p>
-            <p className="text-xs text-muted-foreground">Pendientes</p>
-          </div>
-          <div>
-            <p className="text-2xl font-semibold">{finished.filter(a => a.status === 'completed').length}</p>
-            <p className="text-xs text-muted-foreground">Completadas</p>
-          </div>
-        </div>
+        <WeekNavigator weekStart={weekStart} />
       </div>
-
-      {/* Citas activas */}
-      {active.length > 0 ? (
-        <div className="space-y-3">
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Por atender
-          </h2>
-          {active.map((a) => (
-            <AppointmentCard key={a.id} appointment={a as any} />
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <CalendarDays className="h-12 w-12 text-muted-foreground/30 mb-4" />
-          <h2 className="font-medium">Sin citas pendientes hoy</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Todas las citas del día están atendidas
-          </p>
-        </div>
-      )}
-
-      {/* Citas terminadas */}
-      {finished.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Completadas / Canceladas
-          </h2>
-          {finished.map((a) => (
-            <AppointmentCard key={a.id} appointment={a as any} />
-          ))}
-        </div>
-      )}
-
+ 
+      {/* Vista semanal — un DayColumn por día */}
+      <div className="space-y-3">
+        {days.map((date) => (
+          <DayColumn
+            key={date}
+            date={date}
+            appointments={(apptsByDate[date] ?? []) as AppointmentWithDetails[]}
+            isToday={date === today}
+          />
+        ))}
+      </div>
+ 
     </div>
   )
 }
