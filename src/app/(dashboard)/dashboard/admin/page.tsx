@@ -10,6 +10,7 @@ import { InviteVetButton } from '@/components/admin/InviteVetButton'
 import { VerifyVetButton } from '@/components/admin/VerifyVetButton'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { Appointment } from '@/types/supabase'
 
 export const metadata: Metadata = { title: 'Panel de administración' }
 
@@ -115,7 +116,7 @@ export default async function AdminDashboardPage() {
         id, scheduled_time, status, total, 
         pets:pet_id (name),
         vet: vet_id (full_name),
-        client: client_id (full_name),
+        client: client_id (full_name)
       `)
       .eq('scheduled_date', today)
       .not('status', 'eq', 'cancelled')
@@ -184,7 +185,7 @@ export default async function AdminDashboardPage() {
                     </span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">
-                        {(cita.pets as any)?.name} — {(cita.client as any)?.full_name}
+                        {(cita.pets as any)?.name | jh} — {(cita.client as any)?.full_name}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Dr. {(cita.vet as any)?.full_name}

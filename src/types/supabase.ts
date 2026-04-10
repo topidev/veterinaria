@@ -168,6 +168,96 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          last_message_at: string
+          status: Database["public"]["Enums"]["conversation_status"]
+          subject: string
+          vet_id: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          status?: Database["public"]["Enums"]["conversation_status"]
+          subject: string
+          vet_id?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          status?: Database["public"]["Enums"]["conversation_status"]
+          subject?: string
+          vet_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_vet_id_fkey"
+            columns: ["vet_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          is_read: boolean
+          sender_id: string
+          sender_role: Database["public"]["Enums"]["user_role"]
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          sender_id: string
+          sender_role: Database["public"]["Enums"]["user_role"]
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          sender_id?: string
+          sender_role?: Database["public"]["Enums"]["user_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pets: {
         Row: {
           breed: string | null
@@ -381,6 +471,7 @@ export type Database = {
       | "completed"
       | "cancelled"
       appointment_type: "scheduled" | "walk_in"
+      conversation_status: "open" | "in_progress" | "resolved"
       payment_status: "pending" | "paid" | "refunded"
       pet_sex: "male" | "female"
       pet_species: "dog" | "cat" | "bird" | "rabbit" | "other"
@@ -509,34 +600,43 @@ export type CompositeTypes<
   ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
   : never
 
+
 // Agregar al final de src/types/supabase.ts
 
 // ─── Aliases Sprint 0-1 ───────────────────────────────────────────────────────
-export type Profile         = Tables<'profiles'>
-export type ProfileInsert   = TablesInsert<'profiles'>
-export type ProfileUpdate   = TablesUpdate<'profiles'>
-export type VetProfile      = Tables<'veterinario_profiles'>
-export type ClienteProfile  = Tables<'cliente_profiles'>
-export type Pet             = Tables<'pets'>
-export type PetInsert       = TablesInsert<'pets'>
-export type PetUpdate       = TablesUpdate<'pets'>
-export type UserRole        = Enums<'user_role'>
-export type PetSpecies      = Enums<'pet_species'>
-export type PetSex          = Enums<'pet_sex'>
+export type Profile = Tables<'profiles'>
+export type ProfileInsert = TablesInsert<'profiles'>
+export type ProfileUpdate = TablesUpdate<'profiles'>
+export type VetProfile = Tables<'veterinario_profiles'>
+export type ClienteProfile = Tables<'cliente_profiles'>
+export type Pet = Tables<'pets'>
+export type PetInsert = TablesInsert<'pets'>
+export type PetUpdate = TablesUpdate<'pets'>
+export type UserRole = Enums<'user_role'>
+export type PetSpecies = Enums<'pet_species'>
+export type PetSex = Enums<'pet_sex'>
 
 // ─── Aliases Sprint 3 ─────────────────────────────────────────────────────────
-export type Service                = Tables<'services'>
-export type ServiceInsert          = TablesInsert<'services'>
-export type VetSchedule            = Tables<'vet_schedules'>
-export type VetScheduleInsert      = TablesInsert<'vet_schedules'>
-export type Appointment            = Tables<'appointments'>
-export type AppointmentInsert      = TablesInsert<'appointments'>
-export type AppointmentUpdate      = TablesUpdate<'appointments'>
-export type AppointmentService     = Tables<'appointment_services'>
+export type Service = Tables<'services'>
+export type ServiceInsert = TablesInsert<'services'>
+export type VetSchedule = Tables<'vet_schedules'>
+export type VetScheduleInsert = TablesInsert<'vet_schedules'>
+export type Appointment = Tables<'appointments'>
+export type AppointmentInsert = TablesInsert<'appointments'>
+export type AppointmentUpdate = TablesUpdate<'appointments'>
+export type AppointmentService = Tables<'appointment_services'>
 export type AppointmentServiceInsert = TablesInsert<'appointment_services'>
-export type AppointmentStatus      = Enums<'appointment_status'>
-export type AppointmentType        = Enums<'appointment_type'>
-export type PaymentStatus          = Enums<'payment_status'>
+export type AppointmentStatus = Enums<'appointment_status'>
+export type AppointmentType = Enums<'appointment_type'>
+export type PaymentStatus = Enums<'payment_status'>
+
+// ─── Aliases Sprint 4 ─────────────────────────────────────────────────────────
+export type Conversation = Tables<'conversations'>
+export type ConversationInsert = TablesInsert<'conversations'>
+export type Message = Tables<'messages'>
+export type MessageInsert = TablesInsert<'messages'>
+export type ConversationStatus = Enums<'conversation_status'>
+
 
 export const Constants = {
   public: {
@@ -549,6 +649,7 @@ export const Constants = {
         "cancelled",
       ],
       appointment_type: ["scheduled", "walk_in"],
+      conversation_status: ["open", "in_progress", "resolved"],
       payment_status: ["pending", "paid", "refunded"],
       pet_sex: ["male", "female"],
       pet_species: ["dog", "cat", "bird", "rabbit", "other"],
