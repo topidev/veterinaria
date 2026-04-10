@@ -83,7 +83,7 @@ export default async function AdminDashboardPage() {
     supabase
       .from("appointments")
       .select("*", { count: 'exact', head: true })
-      .eq('schedule_date', today).not('status', 'eq', 'cancelled'),
+      .eq('scheduled_date', today).not('status', 'eq', 'cancelled'),
 
     // Ingresos del Mes
     supabase
@@ -185,7 +185,7 @@ export default async function AdminDashboardPage() {
                     </span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">
-                        {(cita.pets as any)?.name | jh} — {(cita.client as any)?.full_name}
+                        {(cita.pets as any)?.name} — {(cita.client as any)?.full_name}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Dr. {(cita.vet as any)?.full_name}
