@@ -18,7 +18,7 @@ export const addPetSchema = z.object({
   date_of_birth: z.string().optional().or(z.literal('')),
 
   weight_kg: z
-    .number({ invalid_type_error: 'Ingresa un número válido' })
+    .number({ message: 'Ingresa un número válido' })
     .positive('El peso debe ser mayor a 0')
     .optional(),
 
