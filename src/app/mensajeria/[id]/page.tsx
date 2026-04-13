@@ -27,7 +27,10 @@ export default async function ConversacionPage({ params }: ConvPageProps) {
   // Leer conversación
   const { data: conversation } = await supabase
     .from('conversations')
-    .select('*')
+    .select(`
+      *,
+      vet:profiles!conversations_vet_id_fkey ( full_name )
+    `)
     .eq('id', id)
     .single()
 
@@ -50,9 +53,11 @@ export default async function ConversacionPage({ params }: ConvPageProps) {
     .eq('conversation_id', id)
     .order('created_at', { ascending: true })
 
+  const vetName = (conversation.vet as any)?.full_name ?? null
+
   return (
     <ChatWindow
-      conversation={conversation}
+      conversation={{...conversation, vet_name: vetName}}
       initialMessages={messages ?? []}
       currentUserId={user.id}
       currentRole={role}

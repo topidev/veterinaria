@@ -4,6 +4,8 @@ import { ConversationList } from "@/components/mensajeria/ConversationList";
 import { NewConversationButton } from "@/components/mensajeria/NewConversationButton";
 import { createClient } from "@/lib/supabase/server";
 import { UserRole } from "@/types/supabase";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function MensajeriaLayout({ children }: { children: React.ReactNode }) {
@@ -48,23 +50,38 @@ export default async function MensajeriaLayout({ children }: { children: React.R
     unreadCount: unreadByConv[c.id] ?? 0,
   }))
 
+  const dashboardHref = `/dashboard/${role}`
+
   return (
     <div className="flex h-[calc(100vh-56px)]">
-
-      {/* Sidebar de conversaciones */}
-      <div className="w-80 shrink-0 border-r flex flex-col">
-        <div className="flex items-center justify-between px-4 py-3 border-b">
-          <h2 className="font-semibold text-sm">Mensajes</h2>
+ 
+      {/* Sidebar — oculto en mobile cuando hay conversación activa */}
+      <div className="w-full md:w-80 shrink-0 border-r flex flex-col
+                      md:flex md:relative
+                      absolute inset-0 md:inset-auto bg-background z-10
+                      in-[.has-conversation]:hidden md:in-[.has-conversation]:flex">
+ 
+        {/* Header del sidebar */}
+        <div className="flex items-center gap-3 px-4 py-3 border-b">
+          {/* Link de regreso al dashboard */}
+          <Link
+            href={dashboardHref}
+            className="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors shrink-0"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Link>
+          <h2 className="font-semibold text-sm flex-1">Mensajes</h2>
           {role === 'cliente' && <NewConversationButton />}
         </div>
+ 
         <ConversationList conversations={convsWithUnread} />
       </div>
-
+ 
       {/* Contenido principal */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 flex flex-col">
         {children}
       </div>
-
+ 
     </div>
   )
 
