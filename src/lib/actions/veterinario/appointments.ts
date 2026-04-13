@@ -3,6 +3,12 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
+import { sendEmail } from '@/lib/email/send'
+import {
+  appointmentConfirmedEmail,
+  appointmentCancelledEmail,
+} from '@/lib/email/templates'
 import type { AppointmentStatus } from '@/types/supabase'
 
 type ActionResult = { error: string } | { success: true }
@@ -14,6 +20,22 @@ const VALID_TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]> = {
   in_progress: ['completed'],
   completed:   [],
   cancelled:   [],
+}
+
+function formatDateForEmail(dateStr: string, timeStr: string) {
+  const DIAS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado']
+  const MESES = ['enero','febrero','marzo','abril','mayo','junio',
+                 'julio','agosto','septiembre','octubre','noviembre','diciembre']
+  const d = new Date(dateStr + 'T12:00:00')
+  return {
+    date: `${DIAS[d.getUTCDay()]} ${d.getUTCDate()} de ${MESES[d.getMonth()]} ${d.getUTCFullYear()}`, time: timeStr.slice(0, 5) + 'hrs',  
+  }
+}
+
+async function getUserEmail(userId: string): Promise<string | null> {
+  const { data, error } = await supabaseAdmin.auth.admin.getUserById(userId)
+  if (error || !data.user) return null
+  return data.user.email ?? null
 }
 
 export async function updateAppointmentStatus(
@@ -28,7 +50,20 @@ export async function updateAppointmentStatus(
   // Leer el status actual para validar la transición
   const { data: appointment } = await supabase
     .from('appointments')
-    .select('status, vet_id')
+    .select(`
+      status,
+      client_id, 
+      vet_id,
+      scheduled_time,
+      scheduled_date,
+      total,
+      pets:pet_id ( name ),
+      client:profiles!client_id ( full_name ),
+      vet:profiles!vet_id ( full_name ),
+      appointment_services (
+        services:service_id ( name )
+      )
+    `)
     .eq('id', appointmentId)
     .single()
 
@@ -60,6 +95,51 @@ export async function updateAppointmentStatus(
     .eq('id', appointmentId)
 
   if (error) return { error: 'Error al actualizar la cita.' }
+
+  const { date, time } = formatDateForEmail(
+    appointment.scheduled_date,
+    appointment.scheduled_time
+  )
+
+  const petName = (appointment.pets as any)?.name ?? 'tu mascota'
+  const vetName = (appointment.vet as any)?.full_name ?? 'el veterinario'
+  const clientName = (appointment.client as any)?.full_name ?? 'Cliente'
+  const services = ((appointment.appointment_services as any[]) ?? [])
+
+  const emailData = {
+    clientName, petName, vetName, date, time, services,
+    total: Number(appointment.total),
+  }
+
+  if(newStatus === 'confirmed') {
+    const clientEmail = await getUserEmail(appointment.client_id)
+    if (clientEmail) {
+      const { subject, html } = appointmentConfirmedEmail(emailData)
+      await sendEmail({ to: clientEmail, subject, html })
+    }
+  }
+
+  if (newStatus === 'cancelled') {
+    const cancelledBy = isAdmin ? 'admin' : isVet ? 'veterinario' : 'cliente'
+    const [clientEmail, vetEmail] = await Promise.all([
+      getUserEmail(appointment.client_id),
+      getUserEmail(appointment.vet_id),
+    ])
+    if(clientEmail) {
+      const {subject, html } = appointmentCancelledEmail({
+        ...emailData, cancelledBy, recipientName: clientName,
+      })
+      await sendEmail({ to: clientEmail, subject, html })
+    }
+
+    if (vetEmail && cancelledBy !== 'veterinario') {
+      const { subject, html } = appointmentCancelledEmail( {
+        ...emailData, cancelledBy, recipientName: `Dr. %{vetName}`
+      })
+      await sendEmail( { to: vetEmail, subject, html })
+    }
+  }
+
 
   revalidatePath('/dashboard/veterinario/agenda')
   revalidatePath('/dashboard/veterinario')
