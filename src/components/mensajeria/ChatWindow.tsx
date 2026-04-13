@@ -61,7 +61,7 @@ export function ChatWindow({
         },
         (payload) => {
           const newMessage = payload.new as Message
-
+          console.log('🔴 Mensaje recibido:', payload)
           // Evitar duplicados > el sender ve su mensaje en optimistic update
           setMessages((prev) => {
             const exists = prev.some((m) => m.id === newMessage.id)
@@ -74,7 +74,9 @@ export function ChatWindow({
           }
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        console.log('🔵 Estado del canal:', status)
+      })
     return () => {
       supabase.removeChannel(channel)
     }
@@ -151,8 +153,8 @@ export function ChatWindow({
             <Badge
               variant="outline"
               className={`text-xs ${isResolved ? 'text-green-600 border-green-300' :
-                  isOpen ? 'text-amber-600 border-amber-300' :
-                    'text-blue-600 border-blue-300'
+                isOpen ? 'text-amber-600 border-amber-300' :
+                  'text-blue-600 border-blue-300'
                 }`}
             >
               {isResolved ? 'Resuelto' : isOpen ? 'Sin atender' : 'En progreso'}

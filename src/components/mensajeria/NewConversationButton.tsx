@@ -1,5 +1,6 @@
 // src/components/mensajeria/NewConversationButton.tsx
 
+'use client'
 import { CreateConversation } from "@/lib/mensajeria"
 import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
