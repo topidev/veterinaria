@@ -18,12 +18,12 @@ export const vetProfileSchema = z.object({
     .min(1, 'Agrega al menos una especialidad'),
 
   consultation_fee: z
-    .number({ invalid_type_error: 'Ingresa un número válido' })
+    .number({ message: 'Ingresa un número válido' })
     .positive('La tarifa debe ser mayor a 0')
     .optional(),
 
   years_experience: z
-    .number({ invalid_type_error: 'Ingresa un número válido' })
+    .number({ message: 'Ingresa un número válido' })
     .int('Debe ser un número entero')
     .min(0)
     .max(60)

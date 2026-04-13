@@ -10,6 +10,7 @@ import { InviteVetButton } from '@/components/admin/InviteVetButton'
 import { VerifyVetButton } from '@/components/admin/VerifyVetButton'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { Appointment } from '@/types/supabase'
 
 export const metadata: Metadata = { title: 'Panel de administración' }
 
@@ -82,7 +83,7 @@ export default async function AdminDashboardPage() {
     supabase
       .from("appointments")
       .select("*", { count: 'exact', head: true })
-      .eq('schedule_date', today).not('status', 'eq', 'cancelled'),
+      .eq('scheduled_date', today).not('status', 'eq', 'cancelled'),
 
     // Ingresos del Mes
     supabase
@@ -115,7 +116,7 @@ export default async function AdminDashboardPage() {
         id, scheduled_time, status, total, 
         pets:pet_id (name),
         vet: vet_id (full_name),
-        client: client_id (full_name),
+        client: client_id (full_name)
       `)
       .eq('scheduled_date', today)
       .not('status', 'eq', 'cancelled')
