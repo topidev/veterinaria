@@ -281,7 +281,7 @@ export function ChatWindow({
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Escribe un mensaje... (Enter para enviar)"
+            placeholder="Escribe un mensaje"
             disabled={sending || isPending}
             rows={1}
             className="resize-none min-h-10 max-h-32"
@@ -320,7 +320,7 @@ export function ChatWindow({
     >
       <SheetContent
         side="right"
-        className="p-0 w-full h-full max-w-none flex flex-col sm:max-w-160 [&>button:first-of-type]:hidden"
+        className="p-0 w-screen! h-full max-w-none flex flex-col sm:max-w-160 [&>button:first-of-type]:hidden"
       >
         <SheetHeader className="sr-only">
           <SheetTitle>Conversación: {conversation.subject}</SheetTitle>

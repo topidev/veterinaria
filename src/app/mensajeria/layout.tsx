@@ -53,14 +53,14 @@ export default async function MensajeriaLayout({ children }: { children: React.R
   const dashboardHref = `/dashboard/${role}`
 
   return (
-    <div className="flex h-[calc(100vh-56px)]">
+    <div className="flex h-screen">
  
       {/* Sidebar — en mobile ocupa todo el ancho */}
-      <div className="w-full md:w-80 md:flex-shrink-0 border-r flex flex-col">
+      <div className="w-full md:w-80 md:shrink-0 border-r flex flex-col">
         <div className="flex items-center gap-3 px-4 py-3 border-b">
           <Link
             href={dashboardHref}
-            className="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors flex-shrink-0"
+            className="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors shrink-0"
           >
             <ChevronLeft className="h-4 w-4" />
           </Link>
