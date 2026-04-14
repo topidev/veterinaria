@@ -55,30 +55,25 @@ export default async function MensajeriaLayout({ children }: { children: React.R
   return (
     <div className="flex h-[calc(100vh-56px)]">
  
-      {/* Sidebar — oculto en mobile cuando hay conversación activa */}
-      <div className="w-full md:w-80 shrink-0 border-r flex flex-col
-                      md:flex md:relative
-                      absolute inset-0 md:inset-auto bg-background z-10
-                      in-[.has-conversation]:hidden md:in-[.has-conversation]:flex">
- 
-        {/* Header del sidebar */}
+      {/* Sidebar — en mobile ocupa todo el ancho */}
+      <div className="w-full md:w-80 md:flex-shrink-0 border-r flex flex-col">
         <div className="flex items-center gap-3 px-4 py-3 border-b">
-          {/* Link de regreso al dashboard */}
           <Link
             href={dashboardHref}
-            className="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors shrink-0"
+            className="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors flex-shrink-0"
           >
             <ChevronLeft className="h-4 w-4" />
           </Link>
           <h2 className="font-semibold text-sm flex-1">Mensajes</h2>
           {role === 'cliente' && <NewConversationButton />}
         </div>
- 
-        <ConversationList conversations={convsWithUnread} />
+        <div className="flex-1 overflow-hidden">
+          <ConversationList conversations={convsWithUnread} />
+        </div>
       </div>
  
-      {/* Contenido principal */}
-      <div className="flex-1 min-w-0 flex flex-col">
+      {/* Chat — en mobile solo visible cuando hay conversación */}
+      <div className="hidden md:flex flex-1 min-w-0 flex-col">
         {children}
       </div>
  
