@@ -13,6 +13,13 @@ import { CheckCheck, ChevronLeft, Send } from "lucide-react"
 import { Badge } from "../ui/badge"
 import Link from "next/link"
 import { Textarea } from "../ui/textarea"
+import { useRouter } from "next/navigation"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "../ui/sheet"
 
 const STATUS_CONFIG = {
   open:        { label: 'Sin atender', color: 'text-amber-600 border-amber-300' },
@@ -40,6 +47,8 @@ export function ChatWindow({
   const [sending, setSending] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+  const [isMobile, setIsMobile] = useState(false)
   const [messages, setMessages] = useState<Message[]>(initialMessages)
 
   // Marcar mensaje como leído justo al abrir
@@ -48,8 +57,18 @@ export function ChatWindow({
   }, [conversation.id])
 
   // Ir al ultimo mensaje
+ // Scroll automático al último mensaje (funciona en mobile y desktop)
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const scrollToBottom = () => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+
+    // Pequeño delay para que el Sheet termine de abrirse en mobile
+    const timeout = setTimeout(() => {
+      requestAnimationFrame(scrollToBottom)
+    }, 120)
+
+    return () => clearTimeout(timeout)
   }, [messages])
 
   // Supabase RealTime - escuchar mensajes en la conversación
@@ -96,7 +115,16 @@ export function ChatWindow({
       }
     // })
   }, [conversation.id, currentUserId])
-    
+  
+  // Detectar si es mobile para mostrar Sheet en lugar de vista normal
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const handleSend = async () => {
     const content = input.trim()
@@ -150,14 +178,14 @@ export function ChatWindow({
 
   const config = STATUS_CONFIG[conversation.status]
 
-  return (
+  const chatContent = (
     <div className="flex flex-col h-full">
  
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b flex-shrink-0">
+      <div className="flex items-center gap-3 px-4 py-3 border-b shrink-0">
         <Link
           href="/mensajeria"
-          className="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors flex-shrink-0"
+          className="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors shrink-0"
         >
           <ChevronLeft className="h-4 w-4" />
         </Link>
@@ -181,7 +209,7 @@ export function ChatWindow({
           </div>
         </div>
  
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {isOpen && currentRole === 'veterinario' && (
             <Button size="sm" onClick={handleTakeTicket} disabled={isPending}>
               Tomar ticket
@@ -249,14 +277,14 @@ export function ChatWindow({
  
       {/* Input */}
       {canSend ? (
-        <div className="flex gap-2 px-4 py-3 border-t flex-shrink-0">
+        <div className="flex gap-2 px-4 py-3 border-t shrink-0">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Escribe un mensaje... (Enter para enviar)"
             disabled={sending || isPending}
             rows={1}
-            className="resize-none min-h-[40px] max-h-32"
+            className="resize-none min-h-10 max-h-32"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault()
@@ -266,7 +294,7 @@ export function ChatWindow({
           />
           <Button
             size="icon"
-            className="flex-shrink-0 self-end"
+            className="shrink-0 self-end"
             onClick={handleSend}
             disabled={sending || isPending || !input.trim()}
           >
@@ -274,12 +302,33 @@ export function ChatWindow({
           </Button>
         </div>
       ) : (
-        <div className="px-4 py-3 border-t flex-shrink-0 text-center">
+        <div className="px-4 py-3 border-t shrink-0 text-center">
           <p className="text-xs text-muted-foreground">
             {isResolved ? 'Esta conversación está resuelta' : 'Sin permisos para enviar mensajes'}
           </p>
         </div>
       )}
     </div>
+  )
+
+  return isMobile ? (
+    <Sheet
+      open={true}
+      onOpenChange={(open) => {
+        if (!open) router.back()
+      }}
+    >
+      <SheetContent
+        side="right"
+        className="p-0 w-full h-full max-w-none flex flex-col sm:max-w-160 [&>button:first-of-type]:hidden"
+      >
+        <SheetHeader className="sr-only">
+          <SheetTitle>Conversación: {conversation.subject}</SheetTitle>
+        </SheetHeader>
+        {chatContent}
+      </SheetContent>
+    </Sheet>
+  ) : (
+    chatContent
   )
 }

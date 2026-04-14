@@ -89,7 +89,7 @@ export function AppSidebar({ role, fullName, email, avatarUrl }: AppSidebarProps
 
   return (
     <Sidebar>
-      <SidebarHeader className="border-b px-4 py-3">
+      <SidebarHeader className="border-b px-4 py-3 bg-primary-foreground">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <PawPrint className="h-4 w-4 text-primary-foreground" />
@@ -101,7 +101,7 @@ export function AppSidebar({ role, fullName, email, avatarUrl }: AppSidebarProps
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className='bg-primary-foreground'>
         <SidebarGroup>
           <SidebarGroupLabel>Menú</SidebarGroupLabel>
           <SidebarMenu>
@@ -129,7 +129,7 @@ export function AppSidebar({ role, fullName, email, avatarUrl }: AppSidebarProps
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t">
+      <SidebarFooter className="border-t bg-primary-foreground">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>

@@ -56,15 +56,11 @@ export default async function ConversacionPage({ params }: ConvPageProps) {
   const vetName = (conversation.vet as any)?.full_name ?? null
 
   return (
-    // En mobile: ocupa toda la pantalla encima del layout
-    // En desktop: vive dentro del flex del layout
-    <div className="fixed inset-0 md:static md:inset-auto flex flex-col h-full bg-background z-20">
       <ChatWindow
         conversation={{ ...conversation, vet_name: vetName }}
         initialMessages={messages ?? []}
         currentUserId={user.id}
         currentRole={role}
       />
-    </div>
   )
 }
