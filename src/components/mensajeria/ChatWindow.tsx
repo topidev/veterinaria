@@ -3,8 +3,6 @@
 import { markMessageAsRead, resolveConversation, sendMessage, takeConversation } from "@/lib/mensajeria"
 import { createClient } from "@/lib/supabase/client"
 import { Conversation, Message, UserRole } from "@/types/supabase"
-import { error } from "console"
-import { optimizeImage } from "next/dist/server/image-optimizer"
 import { useEffect, useRef, useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
@@ -81,7 +79,7 @@ export function ChatWindow({
     //   if (!session) return
 
       const channel = supabase
-        .channel(`conversations:${conversation.id}`, {
+        .channel(`conversation:${conversation.id}`, {
           config: {
             broadcast: { self: true },
           }
