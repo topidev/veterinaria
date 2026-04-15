@@ -9,7 +9,7 @@ import { useEffect, useRef, useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
-import { CheckCheck, ChevronLeft, Send } from "lucide-react"
+import { CheckCheck, ChevronLeft, LoaderIcon, Send } from "lucide-react"
 import { Badge } from "../ui/badge"
 import Link from "next/link"
 import { Textarea } from "../ui/textarea"
@@ -20,6 +20,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "../ui/sheet"
+import { Spinner } from "../ui/spinner"
 
 const STATUS_CONFIG = {
   open:        { label: 'Sin atender', color: 'text-amber-600 border-amber-300' },
@@ -131,9 +132,9 @@ export function ChatWindow({
     if (!content || sending) return
 
     setSending(true)
-    setInput('')
-
+    
     const result = await sendMessage(conversation.id, content)
+    setInput('')
     setSending(false)
 
     if ('error' in result) {
@@ -277,14 +278,14 @@ export function ChatWindow({
  
       {/* Input */}
       {canSend ? (
-        <div className="flex gap-2 px-4 py-3 border-t shrink-0">
+        <div className="flex items-center gap-2 px-4 py-3 border-t shrink-0">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Escribe un mensaje"
             disabled={sending || isPending}
             rows={1}
-            className="resize-none min-h-10 max-h-32"
+            className="relative resize-none min-h-10 max-h-32"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault()
@@ -293,12 +294,21 @@ export function ChatWindow({
             }}
           />
           <Button
-            size="icon"
-            className="shrink-0 self-end"
+            size="icon-lg"
+            className="shrink-0 border-0"
             onClick={handleSend}
             disabled={sending || isPending || !input.trim()}
           >
-            <Send className="h-4 w-4" />
+             {sending ? (
+              <Spinner 
+                className="size-5" 
+              />
+             ): (
+              <Send 
+                strokeWidth={1.5}
+                className="size-5" 
+              />
+            )}
           </Button>
         </div>
       ) : (

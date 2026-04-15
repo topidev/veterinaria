@@ -98,7 +98,7 @@ export default async function ClienteDashboardPage() {
       </div>
 
       {/* Métricas */}
-      <div className="flex flex-col items-stretch justify-between gap-2 md:flex-row">
+      <div className="flex flex-col items-stretch justify-between gap-2 md:flex-row max-w-96 mx-auto md:max-w-none">
         <Card className='w-full'>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -113,6 +113,8 @@ export default async function ClienteDashboardPage() {
           </CardContent>
         </Card>
 
+
+        {/* Citas */}    
         <Card className='w-full'>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -121,7 +123,7 @@ export default async function ClienteDashboardPage() {
           </CardHeader>
           <CardContent>
             {nextAppointment ? (
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col lg:flex-row items-start justify-between  gap-3">
                 <div className="flex items-center gap-3">
                   <CalendarDays className="h-5 w-5 text-muted-foreground shrink-0" />
                   <div>
@@ -130,7 +132,7 @@ export default async function ClienteDashboardPage() {
                       Dr. {(nextAppointment.vet as any)?.full_name?.split(' ')[0]}
                     </p>
                     <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                      <Clock className="h-3 w-3" />
+                      <Clock className="h-3 w-3 md:hidden" />
                       {new Date(nextAppointment.scheduled_date + 'T12:00:00')
                         .toLocaleDateString('es-MX', {
                           weekday: 'short', month: 'short', day: 'numeric'
@@ -142,7 +144,7 @@ export default async function ClienteDashboardPage() {
                 </div>
                 <Badge
                   variant="outline"
-                  className={`text-xs shrink-0 ${STATUS_COLORS[nextAppointment.status]}`}
+                  className={`text-xs self-end shrink-0 ${STATUS_COLORS[nextAppointment.status]}`}
                 >
                   {STATUS_LABELS[nextAppointment.status]}
                 </Badge>

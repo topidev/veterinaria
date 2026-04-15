@@ -39,12 +39,12 @@ export function PetCard({ pet, href }: PetCardProps) {
   const species = SPECIES_CONFING[pet.species] ?? SPECIES_CONFING.other
 
   const content = (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer">
+    <Card className="hover:shadow-md transition-shadow cursor-pointer w-full max-w-96 mx-auto md:max-w-none md:mx-0">
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
 
           {/* Foto o avatar con emoji */}
-          <div className="relative h-14 w-14 shrink-0 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+          {/* <div className="relative h-14 w-14 shrink-0 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
             {pet.photo_url ? (
               <Image
                 src={pet.photo_url}
@@ -56,7 +56,7 @@ export function PetCard({ pet, href }: PetCardProps) {
             ) : (
               <span className="text-2xl">{species.emoji}</span>
             )}
-          </div>
+          </div> */}
 
           {/* Info */}
           <div className="flex-1 min-w-0">
@@ -73,7 +73,7 @@ export function PetCard({ pet, href }: PetCardProps) {
               </p>
             )}
 
-            <div className="flex items-center gap-3 mt-1.5">
+            <div className="flex items-center justify-between gap-3 mt-2.5">
               <span className="text-xs text-muted-foreground">
                 {getAge(pet.date_of_birth)}
               </span>

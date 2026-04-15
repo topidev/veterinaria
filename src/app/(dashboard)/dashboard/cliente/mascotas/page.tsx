@@ -25,10 +25,10 @@ export default async function MascotasPage() {
   return (
     <div className="space-y-6">
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Mis mascotas</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-1 mb-2.5 md:mb-auto">
             {petList.length === 0
               ? 'Aún no tienes mascotas registradas'
               : `${petList.length} ${petList.length === 1 ? 'mascota registrada' : 'mascotas registradas'}`

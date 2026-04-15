@@ -68,7 +68,7 @@ export default async function MensajeriaLayout({ children }: { children: React.R
           {role === 'cliente' && <NewConversationButton />}
         </div>
         <div className="flex-1 overflow-hidden">
-          <ConversationList conversations={convsWithUnread} />
+          <ConversationList conversations={convsWithUnread}/>
         </div>
       </div>
  
