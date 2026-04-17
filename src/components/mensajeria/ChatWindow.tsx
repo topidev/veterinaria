@@ -6,8 +6,7 @@ import { Conversation, Message, UserRole } from "@/types/supabase"
 import { useEffect, useRef, useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
-import { Input } from "../ui/input"
-import { CheckCheck, ChevronLeft, LoaderIcon, Send } from "lucide-react"
+import { CheckCheck, ChevronLeft, Send } from "lucide-react"
 import { Badge } from "../ui/badge"
 import Link from "next/link"
 import { Textarea } from "../ui/textarea"
@@ -21,14 +20,14 @@ import {
 import { Spinner } from "../ui/spinner"
 
 const STATUS_CONFIG = {
-  open:        { label: 'Sin atender', color: 'text-amber-600 border-amber-300' },
+  open: { label: 'Sin atender', color: 'text-amber-600 border-amber-300' },
   in_progress: { label: 'En progreso', color: 'text-blue-600 border-blue-300' },
-  resolved:    { label: 'Resuelto',    color: 'text-green-600 border-green-300' },
+  resolved: { label: 'Resuelto', color: 'text-green-600 border-green-300' },
 }
 
 interface ChatWindowProps {
   conversation: Conversation & {
-    vet_name?: string | null 
+    vet_name?: string | null
   }
   initialMessages: Message[]
   currentUserId: string
@@ -41,7 +40,6 @@ export function ChatWindow({
   currentUserId,
   currentRole,
 }: ChatWindowProps) {
-  const supabase = createClient()
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -56,7 +54,7 @@ export function ChatWindow({
   }, [conversation.id])
 
   // Ir al ultimo mensaje
- // Scroll automático al último mensaje (funciona en mobile y desktop)
+  // Scroll automático al último mensaje (funciona en mobile y desktop)
   useEffect(() => {
     const scrollToBottom = () => {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -78,43 +76,43 @@ export function ChatWindow({
     // supabase.auth.getSession().then(({ data: { session } }) => {
     //   if (!session) return
 
-      const channel = supabase
-        .channel(`conversation:${conversation.id}`, {
-          config: {
-            broadcast: { self: true },
-          }
-        })
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'messages',
-            filter: `conversation_id=eq.${conversation.id}`
-          },
-          (payload) => {
-            const newMessage = payload.new as Message
-            // Evitar duplicados > el sender ve su mensaje en optimistic update
-            setMessages((prev) => {
-              if (prev.some((m) => m.id === newMessage.id)) return prev
-              return [...prev, newMessage]
-            })
+    const channel = supabase
+      .channel(`conversation:${conversation.id}`, {
+        config: {
+          broadcast: { self: true },
+        }
+      })
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversation.id}`
+        },
+        (payload) => {
+          const newMessage = payload.new as Message
+          // Evitar duplicados > el sender ve su mensaje en optimistic update
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === newMessage.id)) return prev
+            return [...prev, newMessage]
+          })
 
-            // Si no es nuestro message, marcar ocmo leído
-            if (newMessage.sender_id !== currentUserId) {
-              markMessageAsRead(conversation.id)
-            }
+          // Si no es nuestro message, marcar ocmo leído
+          if (newMessage.sender_id !== currentUserId) {
+            markMessageAsRead(conversation.id)
           }
-        )
-        .subscribe((status, err) => {
-          console.log('[Realtime] status:', status, err ?? '')
-        })
-      return () => {
-        supabase.removeChannel(channel)
-      }
+        }
+      )
+      .subscribe((status, err) => {
+        console.log('[Realtime] status:', status, err ?? '')
+      })
+    return () => {
+      supabase.removeChannel(channel)
+    }
     // })
   }, [conversation.id, currentUserId])
-  
+
   // Detectar si es mobile para mostrar Sheet en lugar de vista normal
   useEffect(() => {
     const handleResize = () => {
@@ -130,7 +128,7 @@ export function ChatWindow({
     if (!content || sending) return
 
     setSending(true)
-    
+
     const result = await sendMessage(conversation.id, content)
     setInput('')
     setSending(false)
@@ -140,8 +138,8 @@ export function ChatWindow({
       toast.error(result.error)
       setInput(content)
     }
-      // Realtime se encarga de agregar el mensaje — sin optimistic update
-      // para evitar duplicados
+    // Realtime se encarga de agregar el mensaje — sin optimistic update
+    // para evitar duplicados
   }
 
   const handleTakeTicket = () => {
@@ -179,7 +177,7 @@ export function ChatWindow({
 
   const chatContent = (
     <div className="flex flex-col h-full">
- 
+
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b shrink-0">
         <Link
@@ -188,7 +186,7 @@ export function ChatWindow({
         >
           <ChevronLeft className="h-4 w-4" />
         </Link>
- 
+
         <div className="flex-1 min-w-0">
           <p className="font-medium text-sm truncate">{conversation.subject}</p>
           <div className="flex items-center gap-2 mt-0.5 flex-wrap">
@@ -207,7 +205,7 @@ export function ChatWindow({
             )}
           </div>
         </div>
- 
+
         <div className="flex items-center gap-2 shrink-0">
           {isOpen && currentRole === 'veterinario' && (
             <Button size="sm" onClick={handleTakeTicket} disabled={isPending}>
@@ -228,7 +226,7 @@ export function ChatWindow({
           )}
         </div>
       </div>
- 
+
       {/* Mensajes */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
         {messages.length === 0 && (
@@ -236,19 +234,19 @@ export function ChatWindow({
             <p className="text-sm text-muted-foreground">Sin mensajes. Escribe el primero.</p>
           </div>
         )}
- 
+
         {messages.map((message, i) => {
-          const isOwn     = message.sender_id === currentUserId
-          const showRole  = !isOwn && (i === 0 || messages[i - 1].sender_id !== message.sender_id)
-          const showTime  = i === messages.length - 1 || messages[i + 1]?.sender_id !== message.sender_id
- 
+          const isOwn = message.sender_id === currentUserId
+          const showRole = !isOwn && (i === 0 || messages[i - 1].sender_id !== message.sender_id)
+          const showTime = i === messages.length - 1 || messages[i + 1]?.sender_id !== message.sender_id
+
           return (
             <div key={message.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[75%] sm:max-w-[65%] flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
                 {showRole && (
                   <span className="text-xs text-muted-foreground px-1 mb-0.5 capitalize">
                     {message.sender_role === 'veterinario' ? 'Veterinario' :
-                     message.sender_role === 'admin' ? 'Admin' : 'Cliente'}
+                      message.sender_role === 'admin' ? 'Admin' : 'Cliente'}
                   </span>
                 )}
                 <div className={`
@@ -273,7 +271,7 @@ export function ChatWindow({
         })}
         <div ref={bottomRef} />
       </div>
- 
+
       {/* Input */}
       {canSend ? (
         <div className="flex items-center gap-2 px-4 py-3 border-t shrink-0">
@@ -297,14 +295,14 @@ export function ChatWindow({
             onClick={handleSend}
             disabled={sending || isPending || !input.trim()}
           >
-             {sending ? (
-              <Spinner 
-                className="size-5" 
+            {sending ? (
+              <Spinner
+                className="size-5"
               />
-             ): (
-              <Send 
+            ) : (
+              <Send
                 strokeWidth={1.5}
-                className="size-5" 
+                className="size-5"
               />
             )}
           </Button>

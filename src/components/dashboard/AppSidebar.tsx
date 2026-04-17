@@ -38,6 +38,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { logout } from '@/lib/actions/auth'
 import type { UserRole } from '@/types/supabase'
+import { UnreadBadge } from '../mensajeria/UnreadBadge'
 
 const NAV_ITEMS: Record<UserRole, { label: string; href: string; icon: React.ElementType }[]> = {
   admin: [
@@ -75,9 +76,11 @@ interface AppSidebarProps {
   fullName: string | null
   email: string
   avatarUrl: string | null
+  unreadCount: number | null
+  userId: string
 }
 
-export function AppSidebar({ role, fullName, email, avatarUrl }: AppSidebarProps) {
+export function AppSidebar({ role, fullName, email, avatarUrl, unreadCount, userId }: AppSidebarProps) {
   const pathname = usePathname()
   const navItems = NAV_ITEMS[role]
 
@@ -120,6 +123,7 @@ export function AppSidebar({ role, fullName, email, avatarUrl }: AppSidebarProps
                     >
                       <item.icon className="h-4 w-4" />
                       <span>{item.label}</span>
+                      {item.label === 'Mensajes' ? <UnreadBadge initialCount={unreadCount ?? 0} currentUserId={userId} /> : <></>}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

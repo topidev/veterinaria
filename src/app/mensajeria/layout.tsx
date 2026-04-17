@@ -54,7 +54,7 @@ export default async function MensajeriaLayout({ children }: { children: React.R
 
   return (
     <div className="flex h-screen">
- 
+
       {/* Sidebar — en mobile ocupa todo el ancho */}
       <div className="w-full md:w-80 md:shrink-0 border-r flex flex-col">
         <div className="flex items-center gap-3 px-4 py-3 border-b">
@@ -68,15 +68,19 @@ export default async function MensajeriaLayout({ children }: { children: React.R
           {role === 'cliente' && <NewConversationButton />}
         </div>
         <div className="flex-1 overflow-hidden">
-          <ConversationList conversations={convsWithUnread}/>
+          <ConversationList
+            conversations={convsWithUnread}
+            currentRole={role}
+            currentUserId={user.id}
+          />
         </div>
       </div>
- 
+
       {/* Chat — en mobile solo visible cuando hay conversación */}
       <div className="hidden md:flex flex-1 min-w-0 flex-col">
         {children}
       </div>
- 
+
     </div>
   )
 

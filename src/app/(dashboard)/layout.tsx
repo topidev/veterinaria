@@ -56,6 +56,15 @@ export default async function DashboardLayout({
     redirect(`/dashboard/${profile.role}`)
   }
 
+  const { count: unreadCount } = await supabase
+    .from('messages')
+    .select('*', {
+      count: 'exact',
+      head: true
+    })
+    .eq('is_read', false)
+    .neq('sender_id', user.id)
+
 
   return (
     // SidebarProvider controla el estado open/closed.
@@ -67,6 +76,8 @@ export default async function DashboardLayout({
           fullName={profile.full_name}
           email={user.email ?? ''}
           avatarUrl={profile.avatar_url}
+          unreadCount={unreadCount}
+          userId={user.id}
         />
         <SidebarInset>
           <header className="flex h-14 items-center gap-2 border-b px-4">
