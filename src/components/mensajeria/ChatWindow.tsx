@@ -169,7 +169,6 @@ export function ChatWindow({
   const canSend = !isResolved && (
     conversation.client_id === currentUserId ||
     conversation.vet_id === currentUserId ||
-    (isOpen && currentRole === 'veterinario') ||
     currentRole === 'admin'
   )
 
@@ -271,6 +270,22 @@ export function ChatWindow({
         })}
         <div ref={bottomRef} />
       </div>
+
+      {isOpen && currentRole === 'veterinario' && !conversation.vet_id && (
+        <div className="mx-4 mb-3 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 px-4 py-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+              Ticket sin veterinario asignado
+            </p>
+            {/* <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+              Toma el ticket para poder responder al cliente */}
+            {/* </p> */}
+          </div>
+          <Button size="sm" onClick={handleTakeTicket} disabled={isPending} className="shrink-0">
+            Tomar ticket
+          </Button>
+        </div>
+      )}
 
       {/* Input */}
       {canSend ? (
