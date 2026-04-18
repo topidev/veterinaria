@@ -213,6 +213,67 @@ export type Database = {
           },
         ]
       }
+      medical_records: {
+        Row: {
+          appointment_id: string | null
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          next_due_date: string | null
+          pet_id: string
+          title: string
+          type: Database["public"]["Enums"]["record_type"]
+          vet_id: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          next_due_date?: string | null
+          pet_id: string
+          title: string
+          type: Database["public"]["Enums"]["record_type"]
+          vet_id?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          next_due_date?: string | null
+          pet_id?: string
+          title?: string
+          type?: Database["public"]["Enums"]["record_type"]
+          vet_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_records_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_records_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_records_vet_id_fkey"
+            columns: ["vet_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -475,6 +536,12 @@ export type Database = {
       payment_status: "pending" | "paid" | "refunded"
       pet_sex: "male" | "female"
       pet_species: "dog" | "cat" | "bird" | "rabbit" | "other"
+      record_type:
+      | "vacuna"
+      | "desparasitacion"
+      | "cirugia"
+      | "consulta"
+      | "otro"
       user_role: "admin" | "veterinario" | "cliente"
     }
     CompositeTypes: {
@@ -601,8 +668,6 @@ export type CompositeTypes<
   : never
 
 
-// Agregar al final de src/types/supabase.ts
-
 // ─── Aliases Sprint 0-1 ───────────────────────────────────────────────────────
 export type Profile = Tables<'profiles'>
 export type ProfileInsert = TablesInsert<'profiles'>
@@ -637,6 +702,9 @@ export type Message = Tables<'messages'>
 export type MessageInsert = TablesInsert<'messages'>
 export type ConversationStatus = Enums<'conversation_status'>
 
+export type MedicalRecord = Tables<'medical_records'>
+export type MedicalRecordInsert = TablesInsert<'medical_records'>
+export type RecordType = Enums<'record_type'>
 
 export const Constants = {
   public: {
@@ -653,6 +721,7 @@ export const Constants = {
       payment_status: ["pending", "paid", "refunded"],
       pet_sex: ["male", "female"],
       pet_species: ["dog", "cat", "bird", "rabbit", "other"],
+      record_type: ["vacuna", "desparasitacion", "cirugia", "consulta", "otro"],
       user_role: ["admin", "veterinario", "cliente"],
     },
   },
