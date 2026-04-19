@@ -93,13 +93,13 @@ export function AddMedicalRecordForm({
             <div className="space-y-1.5">
                 <Label htmlFor="title">Título</Label>
                 <Input
-                id="title"
-                placeholder="Ej: Vacuna antirrábica anual"
-                disabled={isPending}
-                {...register('title')}
+                    id="title"
+                    placeholder="Ej: Vacuna antirrábica anual"
+                    disabled={isPending}
+                    {...register('title')}
                 />
                 {errors.title && (
-                <p className="text-xs text-destructive">{errors.title.message}</p>
+                    <p className="text-xs text-destructive">{errors.title.message}</p>
                 )}
             </div>
         
