@@ -29,4 +29,62 @@ export const addPetSchema = z.object({
   medical_notes: z.string().max(500).optional().or(z.literal('')),
 })
 
+export const petProfileSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'El nombre es requerido')
+    .max(50, 'Máximo 50 caracteres'),
+  
+  breed: z
+    .string()
+    .max(50, 'Máximo 50 caracteres')
+    .optional()
+    .or(z.literal('')),
+
+  date_of_birth : z
+    .string()
+    .optional()
+    .or(z.literal('')),
+
+  sex: z
+    .string()
+    .optional()
+    .or(z.literal('')),
+})
+
+export const medicalRecordSchema = z.object({
+  pet_id: z.string().uuid(),
+
+  type: z.enum(
+    ['vacuna', 'desparasitacion', 'cirugia', 'consulta', 'otro'],
+    {error: 'Selecciona un tipo'}
+  ),
+
+  title: z
+    .string()
+    .min(1, 'El título es requedido')
+    .max(100),
+  
+  description: z
+    .string()
+    .max(500)
+    .optional()
+    .or(z.literal('')),
+
+  date: z.string().min(1, 'La fecha es requerida'),
+
+  next_due_date: z
+    .string()
+    .optional()
+    .or(z.literal('')),
+
+  appointment_id: z
+    .string()
+    .uuid()
+    .optional()
+    .or(z.literal('')),
+})
+
 export type AddPetFormData = z.infer<typeof addPetSchema>
+export type PetProfileFormData = z.infer<typeof petProfileSchema>
+export type MedicalRecordFormData = z.infer<typeof medicalRecordSchema>
