@@ -60,6 +60,7 @@ export function PetAvatarUpload({
             
             if (uploadError) {
                 toast.error('Error al subir la imagen')
+                console.log(uploadError)
                 setPreview(currentUrl)
                 return
             }

@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { PetAvatarUpload } from '@/components/mascotas/PetAvatarUpload'
 import { PetProfileForm } from '@/components/mascotas/PetProfileForm'
 import { MedicalHistory } from '@/components/mascotas/MedicalHistory'
-import { ChevronLeft } from 'lucide-react'
+import { Scale, ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
@@ -26,7 +26,7 @@ export default async function ClientePetPage({ params }: PetPageProps) {
       .from('pets')
       .select('*')
       .eq('id', id)
-      .eq('owner_id', user.id)  // RLS + verificación explícita
+      .eq('owner_id', user.id)
       .single(),
 
     supabase
@@ -41,7 +41,6 @@ export default async function ClientePetPage({ params }: PetPageProps) {
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
 
-      {/* Header con volver */}
       <div className="flex items-center gap-3">
         <Link
           href="/dashboard/cliente/mascotas"
@@ -67,6 +66,15 @@ export default async function ClientePetPage({ params }: PetPageProps) {
         />
       </div>
 
+      {/* Peso actual — solo lectura para el cliente */}
+      {pet.weight_kg && (
+        <div className="flex items-center gap-2 justify-center text-sm text-muted-foreground">
+          <Scale className="h-4 w-4" />
+          <span>Peso actual: <span className="font-medium text-foreground">{pet.weight_kg} kg</span></span>
+          <span className="text-xs">(actualizado por el veterinario)</span>
+        </div>
+      )}
+
       {/* Formulario de datos básicos */}
       <div className="rounded-xl border p-6 space-y-4">
         <div>
@@ -78,10 +86,11 @@ export default async function ClientePetPage({ params }: PetPageProps) {
         <PetProfileForm pet={pet} />
       </div>
 
-      {/* Historial clínico — solo lectura para el cliente */}
+      {/* Historial clínico — solo lectura */}
       <MedicalHistory
         records={records ?? []}
         petId={pet.id}
+        currentWeight={pet.weight_kg}
         canAdd={false}
       />
 
