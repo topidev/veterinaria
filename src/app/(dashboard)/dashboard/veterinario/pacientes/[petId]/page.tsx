@@ -44,16 +44,16 @@ export default async function VetPetPage({ params }: VetPetPageProps) {
   const imageSrc = pet.photo_url ?? '/images/pet-placeholder.png'
 
   const owner = pet.owner as any
-  const age   = pet.date_of_birth
+  const age = pet.date_of_birth
     ? Math.floor((Date.now() - new Date(pet.date_of_birth).getTime()) / (1000 * 60 * 60 * 24 * 365))
     : null
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6 max-w-2xl mx-auto">
 
       <div className="flex items-center gap-3">
         <Link
-          href="/dashboard/veterinario/agenda"
+          href="/dashboard/veterinario/pacientes"
           className="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-muted transition-colors"
         >
           <ChevronLeft className="h-4 w-4" />

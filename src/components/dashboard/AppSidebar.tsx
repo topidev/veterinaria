@@ -53,6 +53,7 @@ const NAV_ITEMS: Record<UserRole, { label: string; href: string; icon: React.Ele
   veterinario: [
     { label: 'Dashboard', href: '/dashboard/veterinario', icon: LayoutDashboard },
     { label: 'Mi agenda', href: '/dashboard/veterinario/agenda', icon: CalendarDays },
+    { label: 'Pacientes', href: '/dashboard/veterinario/pacientes', icon: PawPrint },
     { label: 'Mensajes', href: '/mensajeria', icon: MessageSquare },
     { label: 'Configuración', href: '/dashboard/veterinario/perfil', icon: Settings },
   ],

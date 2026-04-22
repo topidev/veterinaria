@@ -17,18 +17,18 @@ import { AddMedicalRecordForm } from './AddMedicalRecordForm'
 import type { MedicalRecord, RecordType } from '@/types/supabase'
 
 const TYPE_CONFIG: Record<RecordType, { label: string; icon: React.ElementType; color: string }> = {
-  vacuna:          { label: 'Vacuna',          icon: Syringe,     color: 'text-blue-600 border-blue-300 dark:text-blue-400' },
-  desparasitacion: { label: 'Desparasitación', icon: Bug,         color: 'text-green-600 border-green-300 dark:text-green-400' },
-  cirugia:         { label: 'Cirugía',         icon: Scissors,    color: 'text-red-600 border-red-300 dark:text-red-400' },
-  consulta:        { label: 'Consulta',        icon: Stethoscope, color: 'text-purple-600 border-purple-300 dark:text-purple-400' },
-  otro:            { label: 'Otro',            icon: FileText,    color: 'text-gray-600 border-gray-300' },
+  vacuna: { label: 'Vacuna', icon: Syringe, color: 'text-blue-600 border-blue-300 dark:text-blue-400' },
+  desparasitacion: { label: 'Desparasitación', icon: Bug, color: 'text-green-600 border-green-300 dark:text-green-400' },
+  cirugia: { label: 'Cirugía', icon: Scissors, color: 'text-red-600 border-red-300 dark:text-red-400' },
+  consulta: { label: 'Consulta', icon: Stethoscope, color: 'text-purple-600 border-purple-300 dark:text-purple-400' },
+  otro: { label: 'Otro', icon: FileText, color: 'text-gray-600 border-gray-300' },
 }
 
 interface MedicalHistoryProps {
-  records:       MedicalRecord[]
-  petId:         string
+  records: MedicalRecord[]
+  petId: string
   currentWeight?: number | null
-  canAdd?:       boolean
+  canAdd?: boolean
 }
 
 export function MedicalHistory({
@@ -37,7 +37,7 @@ export function MedicalHistory({
   currentWeight,
   canAdd = false,
 }: MedicalHistoryProps) {
-  const [addOpen, setAddOpen]   = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
   const [expanded, setExpanded] = useState<string | null>(null)
 
   // Registros con peso para la evolución
@@ -67,7 +67,7 @@ export function MedicalHistory({
           <div className="flex items-end gap-3 overflow-x-auto pb-1">
             {[...weightHistory].reverse().map((r, i) => {
               const maxW = Math.max(...weightHistory.map((w) => Number(w.weight_kg)))
-              const pct  = (Number(r.weight_kg) / maxW) * 100
+              const pct = (Number(r.weight_kg) / maxW) * 100
               return (
                 <div key={r.id} className="flex flex-col items-center gap-1 min-w-12">
                   <span className="text-xs font-medium">{Number(r.weight_kg).toFixed(1)}</span>
@@ -97,7 +97,7 @@ export function MedicalHistory({
         <div className="space-y-2">
           {records.map((record) => {
             const config = TYPE_CONFIG[record.type]
-            const Icon   = config.icon
+            const Icon = config.icon
             const isOpen = expanded === record.id
 
             return (

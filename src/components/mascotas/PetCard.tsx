@@ -41,22 +41,23 @@ export function PetCard({ pet, href }: PetCardProps) {
   const content = (
     <Card className="hover:shadow-md transition-shadow cursor-pointer w-full max-w-96 mx-auto md:max-w-none md:mx-0">
       <CardContent className="p-4">
+
+        {/* Foto o avatar con emoji */}
+        <div className="relative h-42 w-full shrink-0 rounded-lg overflow-hidden bg-muted flex items-center justify-center mb-10">
+          {pet.photo_url ? (
+            <Image
+              src={pet.photo_url}
+              alt={pet.name}
+              fill
+              className="object-cover"
+              sizes="512px"
+            />
+          ) : (
+            <span className="text-2xl">{species.emoji}</span>
+          )}
+        </div>
         <div className="flex items-start gap-3">
 
-          {/* Foto o avatar con emoji */}
-          {/* <div className="relative h-14 w-14 shrink-0 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
-            {pet.photo_url ? (
-              <Image
-                src={pet.photo_url}
-                alt={pet.name}
-                fill
-                className="object-cover"
-                sizes="56px"
-              />
-            ) : (
-              <span className="text-2xl">{species.emoji}</span>
-            )}
-          </div> */}
 
           {/* Info */}
           <div className="flex-1 min-w-0">
