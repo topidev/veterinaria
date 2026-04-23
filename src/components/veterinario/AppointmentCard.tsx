@@ -12,17 +12,18 @@ import { Card, CardContent } from '@/components/ui/card'
 
 import { updateAppointmentStatus } from '@/lib/actions/veterinario/appointments'
 import type { AppointmentStatus } from '@/types/supabase'
+import Link from 'next/link'
 
 // Configuración visual por status
 const STATUS_CONFIG: Record<AppointmentStatus, {
   label: string
   color: string
 }> = {
-  pending:     { label: 'Pendiente',   color: 'text-amber-600 border-amber-300 dark:text-amber-400' },
-  confirmed:   { label: 'Confirmada',  color: 'text-blue-600 border-blue-300 dark:text-blue-400' },
+  pending: { label: 'Pendiente', color: 'text-amber-600 border-amber-300 dark:text-amber-400' },
+  confirmed: { label: 'Confirmada', color: 'text-blue-600 border-blue-300 dark:text-blue-400' },
   in_progress: { label: 'En atención', color: 'text-purple-600 border-purple-300 dark:text-purple-400' },
-  completed:   { label: 'Completada',  color: 'text-green-600 border-green-300 dark:text-green-400' },
-  cancelled:   { label: 'Cancelada',   color: 'text-red-600 border-red-300 dark:text-red-400' },
+  completed: { label: 'Completada', color: 'text-green-600 border-green-300 dark:text-green-400' },
+  cancelled: { label: 'Cancelada', color: 'text-red-600 border-red-300 dark:text-red-400' },
 }
 
 // Acciones disponibles por status
@@ -31,19 +32,19 @@ const NEXT_ACTIONS: Record<AppointmentStatus, {
   label: string
   variant: 'default' | 'outline' | 'destructive'
 }[]> = {
-  pending:     [
-    { status: 'confirmed',   label: 'Confirmar',   variant: 'default' },
-    { status: 'cancelled',   label: 'Cancelar',    variant: 'destructive' },
+  pending: [
+    { status: 'confirmed', label: 'Confirmar', variant: 'default' },
+    { status: 'cancelled', label: 'Cancelar', variant: 'destructive' },
   ],
-  confirmed:   [
+  confirmed: [
     { status: 'in_progress', label: 'Iniciar atención', variant: 'default' },
-    { status: 'cancelled',   label: 'Cancelar',         variant: 'destructive' },
+    { status: 'cancelled', label: 'Cancelar', variant: 'destructive' },
   ],
   in_progress: [
-    { status: 'completed',   label: 'Completar',   variant: 'default' },
+    { status: 'completed', label: 'Completar', variant: 'default' },
   ],
-  completed:   [],
-  cancelled:   [],
+  completed: [],
+  cancelled: [],
 }
 
 export type AppointmentWithDetails = {
@@ -51,6 +52,7 @@ export type AppointmentWithDetails = {
   scheduled_time: string
   status: AppointmentStatus
   type: string
+  pet_id: string
   notes: string | null
   vet_notes: string | null
   total: number
@@ -187,7 +189,11 @@ export function AppointmentCard({ appointment }: { appointment: AppointmentWithD
                 <p className="text-sm bg-muted/50 rounded-lg px-3 py-2">{appointment.vet_notes}</p>
               </div>
             )}
-
+            <Button variant="outline" size="sm" className="mt-2" asChild>
+              <Link href={`/dashboard/veterinario/pacientes/${appointment.pet_id}`}>
+                Ver historial del paciente
+              </Link>
+            </Button>
           </div>
         )}
 

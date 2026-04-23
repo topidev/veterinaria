@@ -12,14 +12,14 @@ export const metadata: Metadata = { title: 'Mi agenda' }
 
 function getMonday(dateStr: string): string {
   const date = new Date(dateStr + 'T12:00:00')
-  console.log("[Date]:",date)
+  console.log("[Date]:", date)
   const day = date.getUTCDay()
-  console.log("[Day]:",day)
-  const diff = day === 0 ? -6 : 1 -day
-  console.log("[Difference]:",diff)
-  date.setUTCDate(date.getUTCDate() +  diff)
-  console.log("[Date UTC]:",date)
-  
+  console.log("[Day]:", day)
+  const diff = day === 0 ? -6 : 1 - day
+  console.log("[Difference]:", diff)
+  date.setUTCDate(date.getUTCDate() + diff)
+  console.log("[Date UTC]:", date)
+
   return date.toISOString().split('T')[0]
 }
 
@@ -33,13 +33,13 @@ interface AgendaPageProps {
   searchParams: Promise<{ semana?: string }>
 }
 
-export default async function VetAgendaPage({ searchParams}: AgendaPageProps) {
+export default async function VetAgendaPage({ searchParams }: AgendaPageProps) {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  
+
   const params = await searchParams
   // Fecha de hoy en formato YYYY-MM-DD
   const today = new Date().toISOString().split('T')[0]
@@ -47,13 +47,14 @@ export default async function VetAgendaPage({ searchParams}: AgendaPageProps) {
   const weekStart = params.semana
     ? getMonday(params.semana)
     : getMonday(today)
-  
+
   const weekEnd = addDays(weekStart, 6)
 
   const { data: appointments } = await supabase
     .from('appointments')
     .select(`
       id,
+      pet_id,
       scheduled_date,
       scheduled_time,
       status,
@@ -73,20 +74,20 @@ export default async function VetAgendaPage({ searchParams}: AgendaPageProps) {
     .gte('scheduled_date', weekStart)
     .lte('scheduled_date', weekEnd)
     .order('scheduled_time', { ascending: true })
-  
+
   console.log("[Appointments]: ", appointments)
 
   // Agrupar citas por fecha para pasarlas a cada DayColumn
   const apptsByDate = (appointments ?? []).reduce((acc, a) => {
     const date = a.scheduled_date
-    if(!acc[date]) acc[date] = []
+    if (!acc[date]) acc[date] = []
     acc[date].push(a)
     return acc
   }, {} as Record<string, typeof appointments>)
 
   console.log("[Appointmets GroupBy Date]: ", apptsByDate)
 
-  const days = Array.from({ length: 7}, (_, i) => addDays(weekStart, i))
+  const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
 
   const totalSemana = (appointments ?? []).filter(
     (a) => !['cancelled'].includes(a.status)
@@ -98,7 +99,7 @@ export default async function VetAgendaPage({ searchParams}: AgendaPageProps) {
 
   return (
     <div className="space-y-6 w-full m-auto max-w-375">
- 
+
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
@@ -110,7 +111,7 @@ export default async function VetAgendaPage({ searchParams}: AgendaPageProps) {
         </div>
         <WeekNavigator weekStart={weekStart} />
       </div>
- 
+
       {/* Vista semanal — un DayColumn por día */}
       <div className="space-y-3">
         {days.map((date) => (
@@ -122,7 +123,7 @@ export default async function VetAgendaPage({ searchParams}: AgendaPageProps) {
           />
         ))}
       </div>
- 
+
     </div>
   )
 }
