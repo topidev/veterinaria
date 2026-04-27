@@ -11,6 +11,7 @@ import { AppSidebar } from '@/components/dashboard/AppSidebar'
 import { Separator } from '@/components/ui/separator'
 import type { UserRole } from '@/types/supabase'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { BotWidget } from '@/components/bot/BotWidget'
 
 
 export default async function DashboardLayout({
@@ -89,6 +90,7 @@ export default async function DashboardLayout({
           </main>
         </SidebarInset>
       </SidebarProvider>
+      {profile.role === 'cliente' && <BotWidget />}   
     </TooltipProvider>
   )
 }
